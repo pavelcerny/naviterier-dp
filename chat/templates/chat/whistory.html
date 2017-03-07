@@ -3,8 +3,32 @@
 <head>
     <meta charset="UTF-8">
     <title>With history</title>
+
+    {% load static %}
 </head>
 <body>
 with history
+
+<div class="chat-history">
+    <div class="system-reply"></div>
+    <div class="user-reply"></div>
+</div>
+<form id="post-reply" action="">
+    <label for="reply">vaše odpověď</label>
+    <input id="reply">
+</form>
+
+<script src="{% static "js/jquery.js" %}"></script>
+<script>
+
+$("#post-reply").on('submit', function(ev){
+    ev.preventDefault(); // to stop the form from submitting
+    /* Validations go here */
+    $( ".chat-history" ).append('<div class="user-reply"> moje odpověď </div> ');
+    //this.submit(); // If all the validations succeeded
+});
+</script>
+
+
 </body>
 </html>
