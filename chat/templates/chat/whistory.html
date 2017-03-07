@@ -24,9 +24,31 @@ with history
 $("#post-reply").on('submit', function(ev){
     ev.preventDefault(); // to stop the form from submitting
     /* Validations go here */
-    $( ".chat-history" ).append('<div class="user-reply"> moje odpověď </div> ');
-    //this.submit(); // If all the validations succeeded
+    var userMsg = $('#reply').val();
+    manageReply(userMsg);
 });
+
+
+function manageReply(userMsg) {
+    var output = ".chat-history";
+    //add to history
+    addMyReply(userMsg, output);
+    //todo send to server
+    //todo get response from server
+    //add to history
+    addSystemReply("That's great. How are you?", output);
+}
+
+
+function addMyReply(message, div) {
+    $(div).append('<div class="user-reply">'+ message +'</div> ');
+}
+
+
+function addSystemReply(message, div) {
+    $(div).append('<div class="system-reply">'+ message +'</div> ');
+}
+
 </script>
 
 
