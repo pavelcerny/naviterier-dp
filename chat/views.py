@@ -8,3 +8,7 @@ def index(request):
 
 def index_html(request):
     return render(request, 'chat/helloworld.html', {})
+
+
+def chat_with_history(request):
+    return render(request, 'chat/whistory.html', {})
