@@ -21,6 +21,8 @@
   </div>
 </form>
 
+    <script src="{% static "js/jquery.js" %}"></script>
+
 <!-- HTML5 Speech Recognition API -->
 <script>
   function startDictation() {
@@ -61,21 +63,25 @@
 <script>
     // this is the id of the form
 $("#userReplyForm").submit(function(e) {
+    e.preventDefault(); // avoid to execute the actual submit of the form.
 
     var url = "{% url 'chat:process_request' %}"; // the script where you handle the form input.
+
+    var post_data = {
+        csrfmiddlewaretoken : "{{ csrf_token }}",
+    };
+
     alert('sending request');
 
     $.ajax({
            type: "POST",
            url: url,
-           data: $("#userReplyForm").serialize(), // serializes the form's elements.
+           data: post_data,
            success: function(data)
            {
                alert(data); // show response from the php script.
            }
          });
-
-    e.preventDefault(); // avoid to execute the actual submit of the form.
 });
 </script>
 </body>
