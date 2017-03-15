@@ -21,3 +21,6 @@ def speechrecognition(request):
 def speechrecognition02(request):
     return  render(request, 'chat/speechrecognition02.html', {})
 
+
+def processUserInput(request):
+    return HttpResponse("Basic reply to user input.")
