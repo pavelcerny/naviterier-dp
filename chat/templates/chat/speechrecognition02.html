@@ -69,6 +69,7 @@ $("#userReplyForm").submit(function(e) {
 
     var post_data = {
         csrfmiddlewaretoken : "{{ csrf_token }}",
+        question : "Sentence form user",
     };
 
     alert('sending request');

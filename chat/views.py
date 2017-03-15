@@ -23,4 +23,7 @@ def speechrecognition02(request):
 
 
 def processUserInput(request):
-    return HttpResponse("Basic reply to user input.")
+    text = 'Default reply to user input'
+    if (request.method == 'POST'):
+        text = 'asked:' + request.POST.get("question")
+    return HttpResponse(text)
