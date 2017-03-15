@@ -12,3 +12,12 @@ def index_html(request):
 
 def chat_with_history(request):
     return render(request, 'chat/whistory.html', {})
+
+
+def speechrecognition(request):
+    return  render(request, 'chat/speechrecognition.html', {})
+
+
+def speechrecognition02(request):
+    return  render(request, 'chat/speechrecognition02.html', {})
+

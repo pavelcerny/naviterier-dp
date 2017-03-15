@@ -7,47 +7,57 @@
     {% load static %}
 </head>
 <body>
-with history
 
-<div class="chat-history">
-    <div class="system-reply"></div>
-    <div class="user-reply"></div>
-</div>
-<form id="post-reply" action="">
-    <label for="reply">vaše odpověď</label>
-    <input id="reply">
+{#<div id="active_box" class="chat.active" aria-live="polite">#}
+{#    <div class="system-reply" id="question">Ahoj, jak se máš?</div>#}
+{#</div>#}
+<form id="reply_form" action="">
+    <label id="label" for="reply_input_field" aria-label="Ahoj, jak se máš">zadej odpověď</label>
+    <input id="reply_input_field">
 </form>
+<div id="history_box" class="chat.history">
+
+</div>
 
 <script src="{% static "js/jquery.js" %}"></script>
 <script>
 
-$("#post-reply").on('submit', function(ev){
+$("#reply_form").on('submit', function(ev){
     ev.preventDefault(); // to stop the form from submitting
     /* Validations go here */
-    var userMsg = $('#reply').val();
-    $("#reply").val("");
-    manageReply(userMsg);
+    var userMsg = $('#reply_input_field').val();
+    $("#reply_input_field").val("");
+    var systemQuestion = $('#question').val();
+    manageReply(userMsg, systemQuestion);
 });
 
 
-function manageReply(userMsg) {
-    var output = ".chat-history";
+function manageReply(userMsg, systemQuestion) {
+    var outputHistory = "#history_box";
+    var outputActive = "#label";
     //add to history
-    addMyReply(userMsg, output);
+    addMyReply(userMsg, outputHistory);
+    //addSystemReply(systemQuestion, outputHistory);
     //todo send to server
     //todo get response from server
     //add to history
-    addSystemReply("That's great. How are you?", output);
+    setActiveQuestion("That's great. How are you?", outputActive);
 }
 
 
 function addMyReply(message, div) {
-    $(div).append('<div class="user-reply">'+ message +'</div> ');
+    $(div).prepend('<div class="user-reply">'+ message +'</div> ');
 }
 
 
 function addSystemReply(message, div) {
-    $(div).append('<div class="system-reply">'+ message +'</div> ');
+    $(div).prepend('<div class="system-reply">'+ message +'</div> ');
+}
+
+
+function setActiveQuestion(message, div) {
+    //$(div).html('<div class="system-reply" id="question">'+ message +'</div> ');
+    $(div).attr('aria-label', 'message');
 }
 
 </script>

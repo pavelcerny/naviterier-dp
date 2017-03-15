@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="cz">
+<head>
+    <meta charset="UTF-8">
+    <title>Rozpoznání hlasu</title>
+
+    {% load static %}
+</head>
+<body>
+    <!-- CSS Styles -->
+<style>
+  .speech {border: 1px solid #DDD; width: 300px; padding: 0; margin: 0}
+  .speech input {border: 0; width: 240px; display: inline-block; height: 30px;}
+  .speech img {float: right; width: 40px }
+</style>
+
+<!-- Search Form -->
+<form id="searchForm" method="get" action="https://www.google.com/search">
+  <div class="speech">
+    <input type="text" name="q" id="searchField" placeholder="Speak" aria-haspopup="true"/>
+      <input type="button" onclick="startDictation()" aria-label="hlasem">Hlasem</input>
+{#    <img onclick="startDictation()" src="//i.imgur.com/cHidSVu.gif" />#}
+  </div>
+</form>
+
+<!-- HTML5 Speech Recognition API -->
+<script>
+  function startDictation() {
+
+    if (window.hasOwnProperty('webkitSpeechRecognition')) {
+
+      var recognition = new webkitSpeechRecognition();
+
+      recognition.continuous = false;
+      recognition.interimResults = false;
+
+      recognition.lang = "cs-CZ";
+      recognition.start();
+      console.log('Ready to receive command');
+
+      var diagnostic = document.querySelector('.output');
+      var cmd = document.querySelector('html');
+
+      recognition.onresult = function(e) {
+        document.getElementById('searchField').value
+                                 = e.results[0][0].transcript;
+        recognition.stop();
+        var command = e.results[0][0].transcript;
+        diagnostic.textContent = 'Command received: ' + command;
+
+        //document.getElementById('labnol').submit();
+      };
+
+      recognition.onerror = function(e) {
+        recognition.stop();
+      }
+
+    }
+  }
+</script>
+</body>
+</html>
