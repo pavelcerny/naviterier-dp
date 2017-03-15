@@ -13,10 +13,10 @@
         <div>Ahoj, jak se máš?</div>
     </section>
 <!-- Search Form -->
-<form id="userReplyForm" method="get" action="https://www.google.com/search">
+<form id="userReplyForm" method="get" action="https://www.google.com/search" onsubmit="event.preventDefault(); handleSubmit()">
   <div class="speech">
       <input type="button" onclick="startDictation()" value="Odpověz hlasem" />
-      <input type="text" name="q" id="searchField" placeholder="Odpověz psaním" aria-haspopup="true"/>
+      <input type="text" id="userReply" name="userReply" placeholder="Odpověz psaním" aria-haspopup="true"/>
       <input type="submit" value="Odešli textové pole">
   </div>
 </form>
@@ -42,14 +42,14 @@
       var cmd = document.querySelector('html');
 
       recognition.onresult = function(e) {
-        document.getElementById('searchField').value
-                                 = e.results[0][0].transcript;
+        var commandReceived = e.results[0][0].transcript;
+
+        document.getElementById('userReply').value
+                                 = commandReceived;
         recognition.stop();
-        var command = e.results[0][0].transcript;
-        diagnostic.textContent = 'Command received: ' + command;
 
-
-        document.getElementById('userReplyForm').submit();
+        handleSubmit();
+        //document.getElementById('userReplyForm').submit(handleSubmit);
       };
 
       recognition.onerror = function(e) {
@@ -61,15 +61,14 @@
 </script>
 <!-- On form submit -->
 <script>
-    // this is the id of the form
-$("#userReplyForm").submit(function(e) {
-    e.preventDefault(); // avoid to execute the actual submit of the form.
+
+    function handleSubmit() {
 
     var url = "{% url 'chat:process_request' %}"; // the script where you handle the form input.
 
     var post_data = {
         csrfmiddlewaretoken : "{{ csrf_token }}",
-        question : "Sentence form user",
+        question : document.getElementById("userReply").value,
     };
 
     alert('sending request');
@@ -83,7 +82,10 @@ $("#userReplyForm").submit(function(e) {
                alert(data); // show response from the php script.
            }
          });
-});
+    }
+
+{#    // this is the id of the form#}
+{#$("#userReplyForm").submit(event.preventDefault();handleSubmit());#}
 </script>
 </body>
 </html>
