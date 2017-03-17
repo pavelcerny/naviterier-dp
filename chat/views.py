@@ -22,6 +22,13 @@ def speechrecognition02(request):
     return  render(request, 'chat/speechrecognition02.html', {})
 
 
+def reverseGeocoding(request):
+    return render(request, 'chat/reverse-geocoding.html')
+
+
+# API
+
+# process user input
 def processUserInput(request):
     text = 'Default reply to user input'
     if (request.method == 'POST'):
