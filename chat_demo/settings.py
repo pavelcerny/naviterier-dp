@@ -25,7 +25,9 @@ SECRET_KEY = 'lfq#mv^%a!1gp^&(k&-(72!qi2dsd%o))&*!0cyb5aljit#o5-'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = [
+    'naviterier.pythonanywhere.com',
+]
 
 
 # Application definition
