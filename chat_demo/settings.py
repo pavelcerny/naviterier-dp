@@ -27,7 +27,8 @@ DEBUG = True
 
 ALLOWED_HOSTS = [
     'naviterier.pythonanywhere.com',
-    '127.0.0.1'
+    '127.0.0.1',
+    'localhost',
 ]
 
 
