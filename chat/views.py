@@ -1,6 +1,7 @@
 from django.http import HttpResponse
 from django.shortcuts import render
 
+import requests
 
 def index(request):
     return HttpResponse("Hello, world. You're at the polls index.")
@@ -34,3 +35,17 @@ def processUserInput(request):
     if (request.method == 'POST'):
         text = 'asked:' + request.POST.get("question")
     return HttpResponse(text)
+
+
+# return address
+def getAddress(request):
+    
+    payload = {'lat': 50.094265,
+               'lon': 14.44941,
+               'lod': 7}
+
+    url = 'http://cws.ceda.cz/msol-geo-services/services/geocoding/reverse'
+    r  = requests.get(url, params=payload)
+    data = r.text
+
+    return HttpResponse(data)
