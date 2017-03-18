@@ -3,6 +3,16 @@ from django.shortcuts import render
 
 import requests
 
+import json
+from watson_developer_cloud import ConversationV1
+
+conversation = ConversationV1(
+  username='8df4159f-bfda-48f4-9827-c331200caebd',
+  password='lpULJnXdW2mx',
+  version='2017-02-03'
+)
+
+
 def index(request):
     return HttpResponse("Hello, world. You're at the polls index.")
 
@@ -48,3 +58,19 @@ def getAddress(request):
     data = r.text
 
     return HttpResponse(data)
+
+
+# get Watson conversation response
+def watsonResponse(request):
+    context = {}
+
+    workspace_id = 'e3101b6f-4808-4630-afbe-b07744997c20'
+
+    response = conversation.message(
+        workspace_id=workspace_id,
+        message_input={'text':''},
+        context=context
+    )
+
+    text = json.dumps(response, indent=2)
+    return HttpResponse(text)
