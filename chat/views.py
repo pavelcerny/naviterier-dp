@@ -37,6 +37,10 @@ def reverseGeocoding(request):
     return render(request, 'chat/reverse-geocoding.html')
 
 
+def poi(request):
+    return render(request, 'chat/poi-chat.html')
+
+
 # API
 
 # process user input
@@ -72,5 +76,5 @@ def watsonResponse(request):
         context=context
     )
 
-    text = json.dumps(response, indent=2)
+    text = json.dumps(response)
     return HttpResponse(text)

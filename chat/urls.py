@@ -8,6 +8,7 @@ urlpatterns = [
     url(r'^whistory$', views.chat_with_history, name='w_history'),
     url(r'^speech$', views.speechrecognition02, name='speech'),
     url(r'^reversegc$', views.reverseGeocoding, name='reversegeocoding'),
+    url(r'^poi$', views.poi, name='poi'),
 
     # API
     url(r'^process$', views.processUserInput, name='process_request'),

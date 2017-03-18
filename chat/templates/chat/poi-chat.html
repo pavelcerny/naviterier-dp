@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="cz">
+<head>
+    <meta charset="UTF-8">
+    <title>Hledání trasy - Naviteriér</title>
+
+    {% load static %}
+</head>
+<body>
+
+
+<section id="question" aria-label="otázka">
+    <div>Ahoj, jak se máš?</div>
+</section>
+<!-- Search Form -->
+<form id="userReplyForm" method="get" action="" onsubmit="event.preventDefault(); handleSubmit()">
+    <div class="speech">
+        <input type="button" onclick="startDictation()" value="Odpověz hlasem"/>
+        <input type="text" id="userReply" name="userReply" placeholder="Odpověz psaním" aria-haspopup="true"/>
+        <input type="submit" value="Odešli textové pole">
+    </div>
+</form>
+
+<script src="{% static "js/jquery.js" %}"></script>
+
+<!-- HTML5 Speech Recognition API -->
+<script>
+    function startDictation() {
+
+        if (window.hasOwnProperty('webkitSpeechRecognition')) {
+
+            var recognition = new webkitSpeechRecognition();
+
+            recognition.continuous = false;
+            recognition.interimResults = false;
+
+            recognition.lang = "cs-CZ";
+            recognition.start();
+            console.log('Ready to receive command');
+
+            var diagnostic = document.querySelector('.output');
+            var cmd = document.querySelector('html');
+
+            recognition.onresult = function (e) {
+                var commandReceived = e.results[0][0].transcript;
+
+                document.getElementById('userReply').value
+                    = commandReceived;
+                recognition.stop();
+
+                handleSubmit();
+                //document.getElementById('userReplyForm').submit(handleSubmit);
+            };
+
+            recognition.onerror = function (e) {
+                recognition.stop();
+            }
+
+        }
+    }
+</script>
+
+<!-- On form submit -->
+<script>
+
+    function handleSubmit() {
+
+        var url = "{% url 'chat:process_request' %}"; // the script where you handle the form input.
+
+        var post_data = {
+            csrfmiddlewaretoken: "{{ csrf_token }}",
+            question: document.getElementById("userReply").value,
+        };
+
+        alert('sending request');
+
+        $.ajax({
+            type: "POST",
+            url: url,
+            data: post_data,
+            success: function (data) {
+                alert(data); // show response from the php script.
+            }
+        });
+    }
+
+</script>
+
+<!-- render methods -->
+<script>
+    function displayMessage(message) {
+        document.getElementById("question").innerHTML = message;
+    }
+</script>
+
+<!-- show last watson response-->
+<script>
+    var dialogContext = '';
+    var dialogQuestion = '';
+    $(document).ready(function () {
+        console.log("ready!");
+
+        var url = "{% url 'chat:watson_response' %}";
+        var init_post_data = {
+            csrfmiddlewaretoken: "{{ csrf_token }}",
+            context: {},
+            text: '',
+        };
+        $.ajax({
+            type: "POST",
+            url: url,
+            data: init_post_data,
+            success: function (data) {
+                //alert(data);
+                response = JSON.parse(data);
+                dialogContext = response.context;
+                dialogQuestion = response.output.text[0];
+                displayMessage(dialogQuestion);
+            }
+        })
+    });
+</script>
+
+</body>
+</html>
