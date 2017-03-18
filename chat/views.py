@@ -39,9 +39,8 @@ def processUserInput(request):
 
 # return address
 def getAddress(request):
-    
-    payload = {'lat': 50.094265,
-               'lon': 14.44941,
+    payload = {'lat': request.GET['lat'], #50.094265,
+               'lon': request.GET['lon'], #14.44941,
                'lod': 7}
 
     url = 'http://cws.ceda.cz/msol-geo-services/services/geocoding/reverse'
