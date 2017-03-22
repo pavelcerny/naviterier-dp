@@ -6,6 +6,8 @@ import requests
 import json
 from watson_developer_cloud import ConversationV1
 
+GOOGLE_API_KEY = "AIzaSyC7WCaTEPswl2Cs77ncqxiz7O4fLK2z2Wk"
+
 conversation = ConversationV1(
   username='8df4159f-bfda-48f4-9827-c331200caebd',
   password='lpULJnXdW2mx',
@@ -61,15 +63,24 @@ def processUserInput(request):
 
 # return address
 def getAddress(request):
-    payload = {'lat': request.GET['lat'], #50.094265,
-               'lon': request.GET['lon'], #14.44941,
-               'lod': 7}
+    URL = "https://maps.googleapis.com/maps/api/geocode/json"
 
-    url = 'http://cws.ceda.cz/msol-geo-services/services/geocoding/reverse'
-    r  = requests.get(url, params=payload)
+    # request google API
+    payload = {'latlng': request.GET['lat'] + "," + request.GET['lon'],  # 50.094265,
+               'key': GOOGLE_API_KEY}
+    url = URL
+    r = requests.get(url, params=payload)
     data = r.text
 
-    return HttpResponse(data)
+    # parse json data
+    data = json.loads(data)
+
+    # get object with "lat" and "lng"
+    address = data['results'][0]['formatted_address']
+
+    # to String
+    response_json = json.dumps(address)
+    return HttpResponse(response_json)
 
 
 # get Watson conversation response
@@ -96,7 +107,7 @@ def watsonResponse(request):
 
 # get GPS coords from Address
 def googleGeocodoingAPI(request):
-    API_KEY = "AIzaSyC7WCaTEPswl2Cs77ncqxiz7O4fLK2z2Wk"
+    API_KEY = GOOGLE_API_KEY
     URL = "https://maps.googleapis.com/maps/api/geocode/json"
     address = request.GET['address']
 
