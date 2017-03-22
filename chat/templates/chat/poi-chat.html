@@ -9,9 +9,9 @@
 <body>
 
 
-<section id="question" aria-label="otázka">
-    <div>Ahoj, jak se máš?</div>
-</section>
+
+    <div id="question" aria-live="polite">Ahoj, jak se máš?</div>
+
 <!-- Search Form -->
 <form id="userReplyForm" method="get" action="" onsubmit="event.preventDefault(); handleSubmit()">
     <div class="speech">
@@ -60,27 +60,41 @@
     }
 </script>
 
-<!-- On form submit -->
+<!-- comunication with watson -->
 <script>
+    var dialogContext = '';
+    var dialogQuestion = '';
 
-    function handleSubmit() {
-
-        var url = "{% url 'chat:process_request' %}"; // the script where you handle the form input.
-
+    function textWatson(userText, context) {
+        var url = "{% url 'chat:watson_response' %}";
         var post_data = {
             csrfmiddlewaretoken: "{{ csrf_token }}",
-            question: document.getElementById("userReply").value,
+            context: context,
+            text: userText,
         };
-
-        alert('sending request');
-
         $.ajax({
             type: "POST",
             url: url,
             data: post_data,
             success: function (data) {
-                alert(data); // show response from the php script.
+                //alert(data);
+                var response = JSON.parse(data);
+                dialogContext = response.context;
+                dialogQuestion = response.output.text;
+                displayMessage(dialogQuestion);
             }
+        })
+    }
+</script>
+
+<!-- On form submit -->
+<script>
+
+    function handleSubmit() {
+        var userText = document.getElementById("userReply").value;
+        textWatson(userText,dialogContext);
+        $( '#userReplyForm' ).each(function(){
+            this.reset();
         });
     }
 
@@ -93,31 +107,12 @@
     }
 </script>
 
-<!-- show last watson response-->
+<!-- init conversation with watson-->
 <script>
-    var dialogContext = '';
-    var dialogQuestion = '';
     $(document).ready(function () {
         console.log("ready!");
 
-        var url = "{% url 'chat:watson_response' %}";
-        var init_post_data = {
-            csrfmiddlewaretoken: "{{ csrf_token }}",
-            context: {},
-            text: '',
-        };
-        $.ajax({
-            type: "POST",
-            url: url,
-            data: init_post_data,
-            success: function (data) {
-                //alert(data);
-                response = JSON.parse(data);
-                dialogContext = response.context;
-                dialogQuestion = response.output.text[0];
-                displayMessage(dialogQuestion);
-            }
-        })
+        textWatson('',{});
     });
 </script>
 

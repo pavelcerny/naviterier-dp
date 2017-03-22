@@ -41,6 +41,14 @@ def poi(request):
     return render(request, 'chat/poi-chat.html')
 
 
+def gpsAndCompass(request):
+    return render(request, 'chat/gpsandcompass.html')
+
+
+def showCompass(request):
+    return render(request, 'chat/showcompass.html')
+
+
 # API
 
 # process user input
@@ -67,14 +75,64 @@ def getAddress(request):
 # get Watson conversation response
 def watsonResponse(request):
     context = {}
+    text = ''
+    if ('context' in request.session):
+        context = request.session['context']
+    if ('text' in request.POST):
+        text = request.POST['text']
 
     workspace_id = 'e3101b6f-4808-4630-afbe-b07744997c20'
 
     response = conversation.message(
         workspace_id=workspace_id,
-        message_input={'text':''},
+        message_input={'text':text},
         context=context
     )
 
     text = json.dumps(response)
+    request.session['context'] = response['context']
     return HttpResponse(text)
+
+
+# get GPS coords from Address
+def googleGeocodoingAPI(request):
+    API_KEY = "AIzaSyC7WCaTEPswl2Cs77ncqxiz7O4fLK2z2Wk"
+    URL = "https://maps.googleapis.com/maps/api/geocode/json"
+    address = request.GET['address']
+
+    # request google API
+    payload = {'address': address}
+    url = URL
+    r = requests.get(url, params=payload)
+    data = r.text
+
+    # parse json data
+
+    # EXAMPLE RESPONSE
+    #     {
+    #     "results": [
+    #         {
+    #             "address_components": [
+    #                 ...
+    #             ],
+    #             "formatted_address": "Karlovo nám. 319/3, Nové Město, 120 00 Praha-Praha 2, Czechia",
+    #             "geometry": {
+    #                 "location": {
+    #                     "lat": 50.0739567,
+    #                     "lng": 14.4185332
+    #                 },
+    #                 ...
+    #             },
+    #             ...
+    #         }
+    #     ],
+    #     "status": "OK"
+    # }
+    data = json.loads(data)
+
+    # get object with "lat" and "lng"
+    location = data['results'][0]['geometry']['location']
+
+    # to String
+    response_json = json.dumps(location)
+    return HttpResponse(response_json)
