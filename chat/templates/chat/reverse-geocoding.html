@@ -11,11 +11,12 @@
 
 <!-- info for user -->
 <section id="question" aria-live="polite">
-    <div>Spouštím GPS a určuji tvou přesnou pozici</div>
+    <div id="geolocationNotice"></div>
 </section>
 
 <!-- interactive elements -->
 <button onclick="getAddress()">Ukonči zpřesňování a urči chodník</button>
+
 
 
 <script src="{% static "js/jquery.js" %}"></script>
@@ -29,11 +30,11 @@
     jQuery(document).ready(function () {
         if ("geolocation" in navigator) {
             /* geolocation is available */
-            displayMessage("Spouštím GPS a určuji tvou přesnou pozici");
+            showMessageGeolocation("Spouštím GPS a určuji tvou přesnou pozici");
             var watchID = navigator.geolocation.watchPosition(geo_success, geo_error, geo_options);
         } else {
             /* geolocation IS NOT available */
-            alert("geolocation not present in browser. Try to turn it on and refresh this page!")
+            showMessageGeolocation("geolocation not present in browser. Try to turn it on and refresh this page!")
         }
     });
 
@@ -63,8 +64,19 @@
 
         var shownAccuracy = Math.round(coords.Accuracy);
         if (coords != null) {
-            displayMessage("aktuální přesnost +-" + shownAccuracy + "m. " + int++);
+            showMessageGeolocation("aktuální přesnost +-" + shownAccuracy + "m. " + int++);
         }
+    }
+</script>
+
+<!-- handlers -->
+<script>
+    function showMessage(elementId, message) {
+        document.getElementById(elementId).innerHTML = message;
+    }
+
+    function showMessageGeolocation(message) {
+        showMessage("geolocationNotice", message);
     }
 </script>
 
