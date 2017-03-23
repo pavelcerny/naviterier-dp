@@ -87,7 +87,7 @@
                 var tiltFB = eventData.beta;
 
                 // alpha: The direction the compass of the device aims to in degrees.
-                var dir = eventData.alpha;
+                var dir = (360 - eventData.alpha) % 360;
 
                 // Call the function to use the data on the page.
                 deviceOrientationHandler(tiltLR, tiltFB, dir);
@@ -102,10 +102,11 @@
             document.getElementById("direction").innerHTML = Math.ceil(dir);
 
             // Rotate the disc of the compass.
+            var rotation = dir-180;
             var compassDisc = document.getElementById("compassDiscImg");
-            compassDisc.style.webkitTransform = "rotate(" + dir + "deg)";
-            compassDisc.style.MozTransform = "rotate(" + dir + "deg)";
-            compassDisc.style.transform = "rotate(" + dir + "deg)";
+            compassDisc.style.webkitTransform = "rotate(" + rotation + "deg)";
+            compassDisc.style.MozTransform = "rotate(" + rotation + "deg)";
+            compassDisc.style.transform = "rotate(" + rotation + "deg)";
         }
 
     });
