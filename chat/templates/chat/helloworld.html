@@ -1,24 +1,19 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Rozcestník - Naviteriér</title>
-    <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css">
-    <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap-theme.min.css">
-</head>
-<body>
-<h1>Rozcestník</h1>
+{% extends 'chat/basetemplate.html' %}
+{% block title %}Rozcestník{% endblock %}
+{% block body %}
 
-<ul>
-    <li><a href="{% url 'chat:w_history' %}">with history</a></li>
-    <li><a href="{% url 'chat:speech' %}">speech</a></li>
-    <li><a href="{% url 'chat:reversegeocoding' %}">reverse geocoding</a></li>
-    <li><a href="{% url 'chat:poi' %}">poi</a></li>
-    <li><a href="{% url 'chat:gpsandcompass' %}">gps and compass</a></li>
-    <br>
-    <li><a href="{% url 'chat:showCompass' %}">show compass</a></li>
+    <body>
+    <h1>Rozcestník</h1>
 
-</ul>
+    <ul>
+        <li><a href="{% url 'chat:w_history' %}">with history</a></li>
+        <li><a href="{% url 'chat:speech' %}">speech</a></li>
+        <br>
+        <li><a href="{% url 'chat:reversegeocoding' %}">A - reverse geocoding</a></li>
+        <li><a href="{% url 'chat:poi' %}">B - poi</a></li>
+        <li><a href="{% url 'chat:gpsandcompass' %}">C - gps and compass</a></li>
+        <br>
+        <li><a href="{% url 'chat:showCompass' %}">show compass</a></li>
+    </ul>
 
-</body>
-</html>
+{% endblock %}
