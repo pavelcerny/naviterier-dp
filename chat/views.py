@@ -20,7 +20,7 @@ def index(request):
 
 
 def index_html(request):
-    return render(request, 'chat/helloworld.html', {})
+    return render(request, 'chat/mainPage.html', {})
 
 
 def chat_with_history(request):
