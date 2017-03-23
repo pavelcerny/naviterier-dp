@@ -1,14 +1,12 @@
-<!DOCTYPE html>
-<html lang="cz">
-<head>
-    <meta charset="UTF-8">
-    <title>Hledání trasy - Naviteriér</title>
+{% extends 'chat/basetemplate.html' %}
+{% load static %}
 
-    {% load static %}
-</head>
-<body>
+{% block title %}
+    POI
+{% endblock %}
 
 
+{% block body %}
 
     <div id="question" aria-live="polite">Ahoj, jak se máš?</div>
 
@@ -116,5 +114,4 @@
     });
 </script>
 
-</body>
-</html>
+{% endblock %}

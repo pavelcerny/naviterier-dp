@@ -1,12 +1,12 @@
-<!DOCTYPE html>
-<html lang="cz">
-<head>
-    <meta charset="UTF-8">
-    <title>Reverzní geocoding - Naviteriér</title>
+{% extends 'chat/basetemplate.html' %}
+{% load static %}
 
-    {% load static %}
-</head>
-<body>
+{% block title %}
+    Reverzní geocoding
+{% endblock %}
+
+
+{% block body %}
 
 
 <!-- info for user -->
@@ -320,5 +320,4 @@
         });
     }
 </script>
-</body>
-</html>
+{% endblock %}

@@ -1,13 +1,10 @@
-<!DOCTYPE html>
-<html lang="cz">
-<head>
-    <meta charset="UTF-8">
-    <title>Show compass - Naviteriér</title>
+{% extends 'chat/basetemplate.html' %}
 
-    {% load static %}
-</head>
-<body>
+{% block title %}
+    Show compass
+{% endblock %}
 
+{% block body %}
 <!-- COMPASS -->
 <h1>Coole kompas!</h1>
 
@@ -90,7 +87,7 @@
                 var tiltFB = eventData.beta;
 
                 // alpha: The direction the compass of the device aims to in degrees.
-                var dir = eventData.alpha
+                var dir = eventData.alpha;
 
                 // Call the function to use the data on the page.
                 deviceOrientationHandler(tiltLR, tiltFB, dir);
@@ -98,7 +95,6 @@
         } else {
             document.getElementById("notice").innerHTML = "Sorry the compass is not now working in your device"
         }
-        ;
 
         function deviceOrientationHandler(tiltLR, tiltFB, dir) {
             document.getElementById("tiltLR").innerHTML = Math.ceil(tiltLR);
@@ -116,5 +112,4 @@
 </script>
 
 
-</body>
-</html>
+{% endblock %}

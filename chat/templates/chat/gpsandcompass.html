@@ -1,13 +1,12 @@
-<!DOCTYPE html>
-<html lang="cz">
-<head>
-    <meta charset="UTF-8">
-    <title>GPS & compass - Naviteriér</title>
+{% extends 'chat/basetemplate.html' %}
+{% load static %}
 
-    {% load static %}
-</head>
-<body>
+{% block title %}
+    GPS & kompas
+{% endblock %}
 
+
+{% block body %}
 
 <!-- info for user -->
 <!-- compass info -->
@@ -186,13 +185,13 @@
 <script>
     showMessageProgress("stoupni si zády k budově");
     var userCoords = {
-        'lat':0, //todo
-        'lon': 0, //todo
+        'lat': document.getElementById("lat").innerHTML,
+        'lon': document.getElementById("lon").innerHTML,
     }
 
     var targetCoords = {
-        'lat':0, //todo
-        'lon': 0, //todo
+        'lat': document.getElementById("targetLat").innerHTML,
+        'lon': document.getElementById("targetLon").innerHTML,
     }
 
     var targetVector = {
@@ -533,5 +532,4 @@ document.addEventListener("DOMContentLoaded", function(event) {
 
 });
 </script>{% endcomment %}
-</body>
-</html>
+{% endblock %}
