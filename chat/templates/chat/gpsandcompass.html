@@ -1,6 +1,7 @@
 {% extends 'chat/basetemplate.html' %}
 {% load static %}
 
+
 {% block title %}
     GPS & kompas
 {% endblock %}
@@ -13,9 +14,9 @@
 <div id="compassNotice"></div>
 
 <div class="orientation-data">
-		<div>Angle forward-back: <span id="tiltFB"></span></div>
-		<div>Angle left-right: <span id="tiltLR"></span></div>
-		<div>Direction: <span id="direction"></span></div>
+		<div>Angle forward-back: <span id="tiltFB">0</span></div>
+		<div>Angle left-right: <span id="tiltLR">0</span></div>
+		<div>Direction: <span id="direction">0</span></div>
 </div>
 
 <!-- geolocation info -->
@@ -24,14 +25,14 @@
 <div id="geolocationNotice"></div>
 
 <div class="geolocation-data">
-		<div>lat: <span id="lat"></span></div>
-		<div>lon: <span id="lon"></span></div>
-		<div>accuracy: <span id="accuracy"></span> m </div>
+		<div>lat: <span id="lat">0</span></div>
+		<div>lon: <span id="lon">0</span></div>
+		<div>accuracy: <span id="accuracy">0</span> m </div>
 </div>
 
 <!-- interactive elements -->
 <form onsubmit="event.preventDefault(); getGpsCoords();">
-    <input id="inputTargetAddress">
+    <input id="inputTargetAddress" value="I.P. Pavlova">
     <input type="submit" value="Get GPS coords">
 </form>
 
@@ -39,16 +40,32 @@
 <div id="targetNotice"></div>
 
 <div class="target-data">
-		<div>lat: <span id="targetLat"></span></div>
-		<div>lon: <span id="targetLon"></span></div>
+		<div>lat: <span id="targetLat">0</span></div>
+		<div>lon: <span id="targetLon">0</span></div>
 </div>
-
 
 
 <div id="progressNotice"></div>
 
+{#    <button onclick="whereToGo()">Stojím zády k budově</button>#}
 
+<script src="{% static "chat/math.min.js" %}"></script>
 <script src="{% static "js/jquery.js" %}"></script>
+
+    <script>
+        Math.radians = function (degrees) {
+            return degrees * Math.PI / 180;
+        };
+
+        // Converts from radians to degrees.
+        Math.degrees = function (radians) {
+            return radians * 180 / Math.PI;
+        };
+
+        function mod(n, m) {
+        return ((n % m) + m) % m;
+}
+    </script>
 <!--- Init -->
 <script>
     document.addEventListener("DOMContentLoaded", function(event) {
@@ -109,6 +126,8 @@
 
                 // Call the function to use the data on the page.
                 deviceOrientationHandler(tiltLR, tiltFB, dir);
+
+                whereToGo();
             }, false);
         } else {
             document.getElementById("compassNotice").innerHTML = "Špatné! DeviceOrientationEvent API není podporován tímto přístrojem."
@@ -184,28 +203,53 @@
 <!-- say if left or right-->
 <script>
     showMessageProgress("stoupni si zády k budově");
-    var userCoords = {
-        'lat': document.getElementById("lat").innerHTML,
-        'lon': document.getElementById("lon").innerHTML,
+
+    function whereToGo() {
+        var userCoords = {
+            'lat_y': document.getElementById("lat").innerHTML,
+            'lon_x': document.getElementById("lon").innerHTML,
+        };
+
+        var targetCoords = {
+            'lat_y': document.getElementById("targetLat").innerHTML,
+            'lon_x': document.getElementById("targetLon").innerHTML,
+        };
+
+
+        function getAngleTarget() {
+            var targetVector = [targetCoords.lon_x - userCoords.lon_x, targetCoords.lat_y - userCoords.lat_y];
+            var northVector = [1, 1];
+
+            var cosAlpha = math.dot(targetVector, northVector) / ( math.norm(targetVector) * math.norm(northVector) );
+            var atan2value = Math.atan2(targetVector[0], targetVector[1]);
+            var alpha = ( 360 + (atan2value * 180 / Math.PI) ) % 360;
+            return alpha;
+        }
+
+        var alpha = getAngleTarget();
+
+        function getAngleUser() {
+            var beta = document.getElementById("direction").innerHTML;
+            return beta;
+        }
+
+        var beta = getAngleUser();
+
+        function goLeftProbability(target, user) {
+            var diff = user-target;
+
+            probability = ( Math.sin(Math.radians(diff)) + 1 ) /2;
+
+            return probability
+
+        }
+
+        var goLeftProbability = goLeftProbability(alpha, beta)
+        var leftPercentage = Math.round(goLeftProbability*100);
+        var rightPercentage = Math.round(100-leftPercentage);
+        showMessageProgress( "go to Left "+ leftPercentage + "% or go right " + rightPercentage + "%" );
+
     }
-
-    var targetCoords = {
-        'lat': document.getElementById("targetLat").innerHTML,
-        'lon': document.getElementById("targetLon").innerHTML,
-    }
-
-    var targetVector = {
-        'y_lat': targetCoords.lat - userCoords.lat,
-        'x_lon': targetCoords.lon - userCoords.lon,
-    }
-
-    var compassVector = {
-        'y_lat': 1, //todo
-        'x_lon': 0, //todo
-    }
-
-
-
 </script>
 
 
@@ -532,4 +576,6 @@ document.addEventListener("DOMContentLoaded", function(event) {
 
 });
 </script>{% endcomment %}
+
+
 {% endblock %}
