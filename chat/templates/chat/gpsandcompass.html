@@ -46,6 +46,13 @@
 
 
 <div id="progressNotice"></div>
+    <button>jdu do leva</button>
+    <button>jdu do prava</button>
+
+    <div id="beforeCorner"></div>
+    <button>jsem na rohu</button>
+    <div id="onCorner"></div>
+    <div id="afterCorner"></div>
 
 {#    <button onclick="whereToGo()">Stojím zády k budově</button>#}
 
@@ -74,9 +81,14 @@
     });
 </script>
 
-
 <!--- GPS init -->
 <script>
+    var logingEnabled = false;
+    var beforeCorner = true;
+
+    var beforeLog = { "lat": [], "lon":[]};
+    var afterLog = { "lat": [], "lon":[]};
+
     function initGPS() {
         if( "geolocation" in  navigator) {
             showMessageGeolocation("Spouštím GPS a určuji tvou přesnou pozici");
@@ -104,7 +116,25 @@
         lon = position.coords.longitude;
         accuracy = position.coords.accuracy
 
+        logGpsCoords(logingEnabled, lat, lon);
         geolocationHandler(lat, lon, accuracy);
+    }
+
+    function logGpsCoords(logingEnabled, lat, lon) {
+        function log(lat, lon, object) {
+            object.lat.push(lat);
+            object.lon.push(lon);
+        }
+
+        if(logingEnabled) {
+            if (beforeCorner) {
+
+                log(lat, lon, beforeLog);
+            } else {
+
+                log(lat, lon, afterLog);
+            }
+        }
     }
 </script>
 
@@ -145,18 +175,25 @@
     function showMessageCompass(message) {
         showMessage("compassNotice",message);
     }
-
     function showMessageGeolocation(message) {
         showMessage("geolocationNotice", message);
     }
-
     function showMessageTarget(message) {
         showMessage("targetNotice",message);
     }
-
     function showMessageProgress(message) {
         showMessage("progressNotice",message);
     }
+    function showMessageBeforeCorner(message){
+        showMessage("beforeCorner",message);
+    }
+    function showMessageOnCorner(message){
+        showMessage("onCorner",message);
+    }
+    function showMessageAfterCorner(message){
+        showMessage("afterCorner",message);
+    }
+
 
     function deviceOrientationHandler(tiltLR, tiltFB, dir) {
       document.getElementById("tiltLR").innerHTML = Math.ceil(tiltLR);
@@ -251,6 +288,42 @@
 
     }
 </script>
+
+    <!-- go to the corner -->
+    <script>
+        showMessageBeforeCorner("Jdi dál až na první roh nebo křižovatku");
+        //enable GPS loging
+        function startingJourney(){
+            beforeCorner = true;
+            logingEnabled = true;
+        }
+        //todo log GPS
+        //enable GPS loging
+    </script>
+
+    <!-- on the corner-->
+    <script>
+        showMessageOnCorner("");
+        //todo log corner
+        //todo decide cross the pedestrian crossing, go around the corner
+        showMessageOnCorner("pokračuj cca 50 metrů")
+    </script>
+
+    <!-- after the corner -->
+    <script>
+        showMessageAfterCorner("víme tvou přesnou pozici");
+        // todo validate, we know the sidewalk
+    </script>
+
+    <!-- -->
+    <script>
+
+    </script>
+
+    <!-- -->
+    <script>
+
+    </script>
 
 
 {#<!-- determine position from GPS -->#}

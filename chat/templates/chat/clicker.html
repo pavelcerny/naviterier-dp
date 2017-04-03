@@ -56,8 +56,6 @@
                     var object = JSON.parse(json);
                     gpsCoordinatesHandler(object.lat, object.lng);
                     var details = getMapDetails(object.lat, object.lng, radius);
-                    clearCanvas(canvas);
-                    drawMap(details);
                 },
             });
         }
@@ -69,7 +67,7 @@
         }
 
         function getMapDetails(lat, lon, radius) {
-            var url = "{% url "gpsLocalization:getSegments" %}";
+            var url = "{% url "gpsLocalization:getSidewalks" %}";
             var post_data = {
                 csrfmiddlewaretoken : "{{ csrf_token }}",
                 lat : lat,
@@ -83,7 +81,27 @@
                 data: post_data,
                 success: function (data) {
                         map_data = data;
+                        clearCanvas(canvas);
                         drawMap(map_data);
+                },
+            });
+        }
+
+        function getSidewalksDetails(lat, lon, radius) {
+            var url = "{% url "gpsLocalization:getSidewalksGrouped" %}";
+            var post_data = {
+                csrfmiddlewaretoken : "{{ csrf_token }}",
+                lat : lat,
+                lon : lon,
+                radius : radius,
+            }
+            // get details
+            $.ajax({
+                type: "POST",
+                url: url,
+                data: post_data,
+                success: function (data) {
+                        //todo work with grouped
                 },
             });
         }
@@ -189,9 +207,7 @@
         var canvasCenterY = canvas.height / 2;
         ctx.translate(canvasCenterX, canvasCenterY);
 
-        function draw(data) {
-            var segments = data;
-
+        function draw(segments) {
             var dataMinX = 999999999999999;
             var dataMinY = 999999999999999;
             var dataMaxX = -99999999999999;
@@ -318,81 +334,7 @@
 
     <!-- group sidewalks -->
     <script>
-        function groupSidewalks(data) {
-            var segments = data;
 
-            var sidewalks = [];
-
-            for (var i in segments) {
-                var segment = segments[i];
-                if (segment.FormOfWay == "Sidewalk") {
-                    var sidewalk = {
-                        "points" : [],
-                        "first" : [],
-                        "last" : [],
-                    };
-                    sidewalk.points = segment.Shape.Points;
-                    sidewalk.first = sidewalk.points[0];
-                    sidewalk.last = sidewalk.points[sidewalk.points.length-1];
-                    // add sidewalk to the table
-                    sidewalks.push(sidewalk);
-                }
-            }
-
-            for (var i = 0; i < sidewalks.length; i++) {
-                if (sidewalks[i] == null) {
-                    continue;
-                }
-                for (var j = i+1; j < sidewalks.length; j++) {
-                    if (sidewalks[j] == null) {
-                        continue;
-                    }
-                    if (sidewalks[i].first == sidewalks[j].first) {
-
-                        //move j-th to i-th
-                        sidewalks[i].first = sidewalks[j].last;
-                        //todo change order properly
-                        //todo don't include the first or last one
-                        sidewalks[i].points.append(sidewalks[j].points);
-
-                        //delete j-th
-                        sidewalks[j] = null;
-                    } else if (sidewalks[i].first == sidewalks[j].last) {
-
-                        //move j-th to i-th
-                        sidewalks[i].first = sidewalks[j].first;
-                        //todo change order properly
-                        //todo don't include the first or last one
-                        sidewalks[i].points.append(sidewalks[j].points);
-
-                        //delete j-th
-                        sidewalks[j] = null;
-                    } else if (sidewalks[i].last == sidewalks[j].first) {
-
-                        //move j-th to i-th
-                        sidewalks[i].last = sidewalks[j].last;
-                        //todo change order properly
-                        //todo don't include the first or last one
-                        sidewalks[i].points.append(sidewalks[j].points);
-
-                        //delete j-th
-                        sidewalks[j] = null;
-                    } else if (sidewalks[i].last == sidewalks[j].last) {
-
-                        //move j-th to i-th
-                        sidewalks[i].last = sidewalks[j].first;
-                        //todo change order properly
-                        //todo don't include the first or last one
-                        sidewalks[i].points.append(sidewalks[j].points);
-
-                        //delete j-th
-                        sidewalks[j] = null;
-                    }
-                }
-            }
-
-            return sidewalks;
-        }
 
     </script>
 
