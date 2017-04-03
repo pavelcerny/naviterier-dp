@@ -11,6 +11,7 @@ urlpatterns = [
     url(r'^poi$', views.poi, name='poi'),
     url(r'^gps$', views.gpsAndCompass, name='gpsandcompass'),
     url(r'^showcompass$', views.showCompass, name='showCompass'),
+    url(r'^clicker$', views.mapClicker, name='clicker'),
 
 
     # API

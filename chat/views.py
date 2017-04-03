@@ -147,3 +147,7 @@ def googleGeocodoingAPI(request):
     # to String
     response_json = json.dumps(location)
     return HttpResponse(response_json)
+
+
+def mapClicker(request):
+    return render(request,'chat/clicker.html')
