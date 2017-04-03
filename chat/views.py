@@ -51,6 +51,10 @@ def showCompass(request):
     return render(request, 'chat/showcompass.html')
 
 
+def mapClicker(request):
+    return render(request,'chat/clicker.html')
+
+
 # API
 
 # process user input
@@ -149,5 +153,3 @@ def googleGeocodoingAPI(request):
     return HttpResponse(response_json)
 
 
-def mapClicker(request):
-    return render(request,'chat/clicker.html')
