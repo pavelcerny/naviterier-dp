@@ -14,7 +14,7 @@
     <script src="{% static "chat/jquery.serialize-object.min.js" %}"></script>
 
     <!-- interactive elements -->
-    <form onsubmit="event.preventDefault(); getGpsCoords();">
+    <form onsubmit="event.preventDefault(); resetLog(); getGpsCoords();">
         Adresa <input id="inputAddress" value="Lazarská 3"><br>
         radius <input id="inputRadius" value="50"> m <br>
         <input type="submit" value="Zobraz">
@@ -34,6 +34,7 @@
     </canvas>
 
     <input type="button" value="clear" id="clr" size="23" onclick="erase()">
+    <input type="button" value="where am I?" id="clr" size="23" onclick="locate()">
 
     <!-- get address and coords -->
     <script>
@@ -56,6 +57,7 @@
                     var object = JSON.parse(json);
                     gpsCoordinatesHandler(object.lat, object.lng);
                     var details = getMapDetails(object.lat, object.lng, radius);
+                    var groups = getSidewalksDetails(object.lat, object.lng, radius);
                 },
             });
         }
@@ -101,13 +103,9 @@
                 url: url,
                 data: post_data,
                 success: function (data) {
-                        //todo work with grouped
+                        drawSidewalksPoints(data);
                 },
             });
-        }
-
-        function drawMap(details){
-            draw(details);
         }
 
         function clearCanvas(canvas) {
@@ -118,6 +116,8 @@
 
     <!-- collect data from clicking -->
     <script type="text/javascript">
+
+    var userPath = [];
 
     document.addEventListener("DOMContentLoaded", function(event) {
         init();
@@ -148,20 +148,12 @@
         }, false);
     }
 
-    function drawLine() {
-        ctx.beginPath();
-        ctx.moveTo(prevX, prevY);
-        ctx.lineTo(currX, currY);
-        ctx.strokeStyle = penColor;
-        ctx.lineWidth = thickness;
-        ctx.stroke();
-        ctx.closePath();
-    }
 
     function erase() {
         var m = confirm("Want to clear");
         if (m) {
-            clearCanvas(canvas)
+            clearCanvas(canvas);
+            resetLog();
         }
     }
 
@@ -192,8 +184,45 @@
                 currX = e.clientX - canvas.offsetLeft - canvasCenterX;
                 currY = e.clientY - canvas.offsetTop - canvasCenterY;
                 drawLine();
+                collectData(currX,currY);
             }
         }
+
+        function drawLine() {
+            ctx.beginPath();
+            ctx.moveTo(prevX, prevY);
+            ctx.lineTo(currX, currY);
+            ctx.strokeStyle = penColor;
+            ctx.lineWidth = thickness;
+            ctx.stroke();
+            ctx.closePath();
+        }
+    }
+
+    function log(lat, lon) {
+        var coords = {
+            lat: lat,
+            lon: lon
+        }
+        userPath.push(coords)
+    }
+    function getLatFromCanvasX(x) {
+        return (x/resizeCoefficient) + dataCenterX;
+    }
+    function getLonFromCanvasY(y) {
+        //important to flip arround y axis
+        //canvas 0 is left-top corner
+        //coordinate 0 is left-bottom corner
+        return -( (y/resizeCoefficient) + dataCenterY );
+    }
+    function collectData(x, y) {
+        var lat = getLatFromCanvasX(x);
+        var lon = getLonFromCanvasY(y);
+        log(lat,lon);
+    }
+
+    function resetLog(){
+        userPath = []
     }
     </script>
 
@@ -207,7 +236,9 @@
         var canvasCenterY = canvas.height / 2;
         ctx.translate(canvasCenterX, canvasCenterY);
 
-        function draw(segments) {
+        var resizeCoefficient, dataSpanX, dataSpanY, dataCenterX, dataCenterY;
+
+        function drawMap(segments) {
             var dataMinX = 999999999999999;
             var dataMinY = 999999999999999;
             var dataMaxX = -99999999999999;
@@ -265,7 +296,7 @@
                     }
                 }
             }
-
+        }
 
             function dataToCanvasX(x) {
                 return (x - dataCenterX) * resizeCoefficient;
@@ -279,7 +310,7 @@
                 return coordinate.Longitude;
             }
 
-            //important to flip arround penColor axis
+            //important to flip arround y axis
             //canvas 0 is left-top corner
             //coordinate 0 is left-bottom corner
             function getYfromCoordinate(coordinate) {
@@ -287,7 +318,7 @@
             }
 
             function canvasDrawPoint(x, y) {
-                var radius = 6;
+                var radius = 1;
                 ctx.beginPath();
                 ctx.arc(x, y, radius, 0, 2 * Math.PI, false);
                 ctx.fillStyle = 'green';
@@ -328,14 +359,69 @@
                 }
                 return max;
             }
-        }
 
     </script>
 
     <!-- group sidewalks -->
     <script>
 
+        function drawSidewalksPoints(sidewalksPoints) {
+            for (i in sidewalksPoints) {
+                var points = sidewalksPoints[i];
+                var lastX = getXfromCoordinate(points[0]);
+                var lastY = getYfromCoordinate(points[0]);
 
+                drawPoint(lastX, lastY);
+                if (points.length > 1) {
+                    for (var j = 1; j < points.length; j++) {
+                        var x = getXfromCoordinate(points[j]);
+                        var y = getYfromCoordinate(points[j]);
+                        drawPoint(x, y);
+                        ctx.save();
+
+                        ctx.strokeStyle = "red";
+                        ctx.lineWidth = 3
+
+                        drawLine(lastX, lastY, x, y);
+                        ctx.restore();
+                        lastX = x;
+                        lastY = y;
+                    }
+                }
+            }
+        }
+
+    </script>
+
+    <!-- locate -->
+    <script>
+        function locate() {
+            //send GPS log
+            var url = "{% url "gpsLocalization:locateMeAPI" %}";
+            var post_data = {
+                csrfmiddlewaretoken : "{{ csrf_token }}",
+                userPath : userPath,
+            }
+
+            $.ajax({
+                type: "POST",
+                url: url,
+                data: post_data,
+                success: function (json) {
+                    var object = JSON.parse(json);
+                    success_handler(object);
+                },
+            });
+
+            function success_handler(object) {
+                //receive used sidewalks
+                //draw used sidewalks
+                //tell me last used sidewalk
+                //project last coordinate to  last used sidewalk
+                // tell me the GPS position
+                //draw it on the canvas thick
+            }
+        }
     </script>
 
 {% endblock %}

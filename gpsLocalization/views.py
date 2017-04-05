@@ -37,9 +37,60 @@ def getOnlySidewalks(segments):
     return sidewalks
 
 
-def groupSidewalks(sidewalks):
+def getSidewalksPoints(sidewalks):
+    sidewalksPoints = []
+    for s in sidewalks:
+        points = s['Shape']['Points']
+        sidewalksPoints.append(points)
 
-    return NotImplemented
+    return sidewalksPoints
+
+
+def mergeSidewalksPoints(sidewalksPoints):
+    groups = []
+    # add first
+    first = sidewalksPoints[0]
+    rest = sidewalksPoints[1:]
+    groups.append(first)
+
+    for s in rest:
+        createNew = True
+
+        # sort into correct group
+        for i in range(0, len(groups)):
+            # start == start
+            if groups[i][0] == s[0]:
+                # reverse s
+                rev_s = s[::-1]
+                # prepend without last
+                groups[i] = rev_s[:-1] + groups[i]
+                createNew = False
+                break
+            # start == end
+            elif groups[i][0] == s[-1]:
+                # prepend without last
+                groups[i] = s[:-1] + groups[i]
+                createNew = False
+                break
+            # end == start
+            elif groups[i][-1] == s[0]:
+                # append without first
+                groups[i] = groups[i] + s[1:]
+                createNew = False
+                break
+            # end == end
+            elif groups[i][-1] == s[-1]:
+                # reverse s
+                rev_s = s[::-1]
+                # append without first
+                groups[i] = groups[i] + rev_s[1:]
+                createNew = False
+                break
+        # begin new group
+        if createNew:
+            groups.append(s)
+
+    return groups
 
 
 # API
@@ -72,129 +123,16 @@ def getGroupedSidewalksAPI(request):
     radius = request.POST['radius']
     sidewalks = getOnlySidewalks(getSegments(getNaviterierData(lat, lon, radius)))
 
-    groupsOfSidewalks = groupSidewalks(sidewalks)
+    sidewalksPoints = getSidewalksPoints(sidewalks)
+    n_groups = len(sidewalksPoints)
+    while True:
+        sidewalksPoints = mergeSidewalksPoints(sidewalksPoints)
+        if len(sidewalksPoints) == n_groups:
+            break
+        else:
+            n_groups = len(sidewalksPoints)
 
-    return HttpResponse(json.dumps(object), content_type="application/json")
-#     function
-#     groupSidewalks(data)
-#     {
-#         var
-#     segments = data;
-#
-#     var
-#     sidewalks = [];
-#
-#     for (var i in segments) {
-#     var segment = segments[i];
-#     if (segment.FormOfWay == "Sidewalk") {
-#     var sidewalk = {
-#     "points": [],
-#               "first": [],
-#     "last": [],
-#     };
-#     sidewalk.points = segment.Shape.Points;
-#     sidewalk.first = sidewalk.points[0];
-#     sidewalk.last = sidewalk.points[sidewalk.points.length - 1];
-#     // add
-#     sidewalk
-#     to
-#     the
-#     table
-#     sidewalks.push(sidewalk);
-#     }
-#     }
-#
-#     for (var i = 0; i < sidewalks.length; i++) {
-#     if (sidewalks[i] == null) {
-#     continue;
-#     }
-#     for (var j = i+1; j < sidewalks.length; j++) {
-#     if (sidewalks[j] == null) {
-#     continue;
-#     }
-#     if (sidewalks[i].first == sidewalks[j].first) {
-#
-#     // move
-#     j - th
-#     to
-#     i - th
-#     sidewalks[i].first = sidewalks[j].last;
-#     // todo
-#     change
-#     order
-#     properly
-#     // todo
-#     don
-#     't include the first or last one
-#     sidewalks[i].points.append(sidewalks[j].points);
-#
-#     // delete
-#     j - th
-#     sidewalks[j] = null;
-#
-# } else if (sidewalks[i].first == sidewalks[j].last) {
-#
-# // move
-# j - th
-# to
-# i - th
-# sidewalks[i].first = sidewalks[j].first;
-# // todo
-# change
-# order
-# properly
-# // todo
-# don
-# 't include the first or last one
-# sidewalks[i].points.append(sidewalks[j].points);
-#
-# // delete
-# j - th
-# sidewalks[j] = null;
-# } else if (sidewalks[i].last == sidewalks[j].first) {
-#
-# // move
-# j - th
-# to
-# i - th
-# sidewalks[i].last = sidewalks[j].last;
-# // todo
-# change
-# order
-# properly
-# // todo
-# don
-# 't include the first or last one
-# sidewalks[i].points.append(sidewalks[j].points);
-#
-# // delete
-# j - th
-# sidewalks[j] = null;
-# } else if (sidewalks[i].last == sidewalks[j].last) {
-#
-# // move
-# j - th
-# to
-# i - th
-# sidewalks[i].last = sidewalks[j].first;
-# // todo
-# change
-# order
-# properly
-# // todo
-# don
-# 't include the first or last one
-# sidewalks[i].points.append(sidewalks[j].points);
-#
-# // delete
-# j - th
-# sidewalks[j] = null;
-# }
-# }
-# }
-#
-# return sidewalks;
-# }
+    return HttpResponse(json.dumps(sidewalksPoints), content_type="application/json")
 
 
 
@@ -203,12 +141,12 @@ def getMap(request):
     return HttpResponse(mapElements)
 
 
-
-def getSidewalksGrouped(request):
-    return NotImplemented
-
-
 def whereAmI(request):
     address = "Názevulice, kde stojím 7"
     response_json = json.dumps(address)
     return HttpResponse(response_json)
+
+
+def locateMeAPI(request):
+    log = json.loads(request.body)
+    return None
