@@ -6,14 +6,12 @@
     <h1>Rozcestník</h1>
 
     <ul>
-        <li><a href="{% url 'chat:w_history' %}">with history</a></li>
-        <li><a href="{% url 'chat:speech' %}">speech</a></li>
-        <br>
         <li><a href="{% url 'chat:reversegeocoding' %}">A - reverse geocoding</a></li>
         <li><a href="{% url 'chat:poi' %}">B - poi</a></li>
         <li><a href="{% url 'chat:gpsandcompass' %}">C - gps and compass</a></li>
         <br>
         <li><a href="{% url 'chat:showCompass' %}">show compass</a></li>
+        <li><a href="{% url 'chat:clicker' %}">clicker</a></li>
     </ul>
 
 {% endblock %}
