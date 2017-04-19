@@ -46,13 +46,14 @@
 
 
 <div id="progressNotice"></div>
-    <button>jdu do leva</button>
-    <button>jdu do prava</button>
+    <button onclick="startLogingGps()">jdu do leva</button>
+    <button onclick="startLogingGps()">jdu do prava</button>
 
     <div id="beforeCorner"></div>
-    <button>jsem na rohu</button>
+    <button onclick="togleAfterCorner()">jsem na rohu</button>
     <div id="onCorner"></div>
     <div id="afterCorner"></div>
+    <button onclick="whereAmI()">urči mou pozici</button>
 
 {#    <button onclick="whereToGo()">Stojím zády k budově</button>#}
 
@@ -83,6 +84,10 @@
 
 <!--- GPS init -->
 <script>
+    var userPath = {
+        beforeCorner : [],
+        afterCorner : []
+    };
     var logingEnabled = false;
     var beforeCorner = true;
 
@@ -293,30 +298,52 @@
     <script>
         showMessageBeforeCorner("Jdi dál až na první roh nebo křižovatku");
         //enable GPS loging
-        function startingJourney(){
+        function startLogingGps(){
             beforeCorner = true;
             logingEnabled = true;
         }
-        //todo log GPS
-        //enable GPS loging
     </script>
 
     <!-- on the corner-->
     <script>
+        function togleAfterCorner() {
+            beforeCorner = false;
+        }
         showMessageOnCorner("");
-        //todo log corner
-        //todo decide cross the pedestrian crossing, go around the corner
         showMessageOnCorner("pokračuj cca 50 metrů")
     </script>
 
     <!-- after the corner -->
     <script>
         showMessageAfterCorner("víme tvou přesnou pozici");
-        // todo validate, we know the sidewalk
     </script>
 
     <!-- -->
     <script>
+        function whereAmI() {
+            logingEnabled = false;
+            //send GPS logLatLon
+            var url = "{% url "gpsLocalization:locateMeAPI" %}";
+            var post_data = {
+                userPath: userPath,
+                contentType: "application/json; charset=utf-8",
+            }
+
+            $.ajax({
+                type: "POST",
+                url: url,
+                data: JSON.stringify(post_data),
+                success: function (json) {
+                    var object = JSON.parse(json);
+                    success_handler(object);
+                },
+            });
+
+            function success_handler(object) {
+                var myPosition = object.userCoordinates;
+                var edges = object.segmentsTraveled;
+            }
+        }
 
     </script>
 

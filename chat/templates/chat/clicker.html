@@ -22,7 +22,7 @@
 
 
     <div class="target-data">
-    Zobrazím data pro tuto oblast:
+        Zobrazím data pro tuto oblast:
         <div>lat: <span id="lat">0</span></div>
         <div>lon: <span id="lon">0</span></div>
         <div>radius: <span id="radius">0</span></div>
@@ -69,12 +69,13 @@
         }
 
         function getMapDetails(lat, lon, radius) {
-            var url = "{% url "gpsLocalization:getSidewalks" %}";
+            // var url = "{% url "gpsLocalization:getSidewalks" %}";
+            var url = "{% url "gpsLocalization:getSegments" %}";
             var post_data = {
-                csrfmiddlewaretoken : "{{ csrf_token }}",
-                lat : lat,
-                lon : lon,
-                radius : radius,
+                csrfmiddlewaretoken: "{{ csrf_token }}",
+                lat: lat,
+                lon: lon,
+                radius: radius,
             }
             // get details
             $.ajax({
@@ -82,9 +83,9 @@
                 url: url,
                 data: post_data,
                 success: function (data) {
-                        map_data = data;
-                        clearCanvas(canvas);
-                        drawMap(map_data);
+                    map_data = data;
+                    clearCanvas(canvas);
+                    drawMap(map_data);
                 },
             });
         }
@@ -92,10 +93,10 @@
         function getSidewalksDetails(lat, lon, radius) {
             var url = "{% url "gpsLocalization:getSidewalksGrouped" %}";
             var post_data = {
-                csrfmiddlewaretoken : "{{ csrf_token }}",
-                lat : lat,
-                lon : lon,
-                radius : radius,
+                csrfmiddlewaretoken: "{{ csrf_token }}",
+                lat: lat,
+                lon: lon,
+                radius: radius,
             }
             // get details
             $.ajax({
@@ -103,7 +104,7 @@
                 url: url,
                 data: post_data,
                 success: function (data) {
-                        drawSidewalksPoints(data);
+                    drawSidewalksPoints(data);
                 },
             });
         }
@@ -117,113 +118,137 @@
     <!-- collect data from clicking -->
     <script type="text/javascript">
 
-    var userPath = [];
-
-    document.addEventListener("DOMContentLoaded", function(event) {
-        init();
-    });
-
-    var flag = false,
-        prevX = 0,
-        currX = 0,
-        prevY = 0,
-        currY = 0,
-        dot_flag = false;
-
-    var penColor = "grey",
-        thickness = 2;
-
-    function init() {
-        canvas.addEventListener("mousemove", function (e) {
-            findxy('move', e)
-        }, false);
-        canvas.addEventListener("mousedown", function (e) {
-            findxy('down', e)
-        }, false);
-        canvas.addEventListener("mouseup", function (e) {
-            findxy('up', e)
-        }, false);
-        canvas.addEventListener("mouseout", function (e) {
-            findxy('out', e)
-        }, false);
-    }
+        var userPath = [];
+        var beforeCorner = [];
+        var afterCorner = [];
+        var logingAllowed = true;
+        var logToBeforeCorner = true;
 
 
-    function erase() {
-        var m = confirm("Want to clear");
-        if (m) {
-            clearCanvas(canvas);
-            resetLog();
+        document.addEventListener("DOMContentLoaded", function (event) {
+            init();
+        });
+
+        var flag = false,
+            prevX = 0,
+            currX = 0,
+            prevY = 0,
+            currY = 0,
+            dot_flag = false;
+
+        var penColor = "grey",
+            thickness = 2;
+
+        function init() {
+            canvas.addEventListener("mousemove", function (e) {
+                findxy('move', e)
+            }, false);
+            canvas.addEventListener("mousedown", function (e) {
+                findxy('down', e)
+            }, false);
+            canvas.addEventListener("mouseup", function (e) {
+                findxy('up', e)
+            }, false);
+            canvas.addEventListener("mouseout", function (e) {
+                findxy('out', e)
+            }, false);
         }
-    }
 
-    function findxy(res, e) {
-        if (res == 'down') {
-            prevX = currX;
-            prevY = currY;
-            currX = e.clientX - canvas.offsetLeft - canvasCenterX;
-            currY = e.clientY - canvas.offsetTop - canvasCenterY;
 
-            flag = true;
-            dot_flag = true;
-            if (dot_flag) {
+        function erase() {
+            var m = confirm("Want to clear");
+            if (m) {
+                clearCanvas(canvas);
+                resetLog();
+            }
+        }
+
+        function findxy(res, e) {
+            if (res == 'down') {
+                if (logingAllowed) {
+                    prevX = currX;
+                    prevY = currY;
+                    currX = e.clientX - canvas.offsetLeft - canvasCenterX + $(window).scrollLeft();
+                    currY = e.clientY - canvas.offsetTop - canvasCenterY + $(window).scrollTop();
+
+                    flag = true;
+                    dot_flag = true;
+                    if (dot_flag) {
+                        ctx.beginPath();
+                        ctx.fillStyle = penColor;
+                        ctx.fillRect(currX, currY, 2, 2);
+                        ctx.closePath();
+                        dot_flag = false;
+                    }
+                } else {
+                    alert('data are already loged, try to reset')
+                }
+            }
+            if (res == 'up' || res == "out") {
+                flag = false;
+                if (logToBeforeCorner) {
+                    logToBeforeCorner = false;
+                } else {
+                    logingAllowed = false;
+                }
+            }
+            if (res == 'move') {
+                if (flag) {
+                    prevX = currX;
+                    prevY = currY;
+                    currX = e.clientX - canvas.offsetLeft - canvasCenterX + $(window).scrollLeft();
+                    currY = e.clientY - canvas.offsetTop - canvasCenterY + $(window).scrollTop();
+                    drawLine();
+                    logXY(currX, currY);
+                }
+            }
+
+
+            function drawLine() {
                 ctx.beginPath();
-                ctx.fillStyle = penColor;
-                ctx.fillRect(currX, currY, 2, 2);
+                ctx.moveTo(prevX, prevY);
+                ctx.lineTo(currX, currY);
+                ctx.strokeStyle = penColor;
+                ctx.lineWidth = thickness;
+                ctx.stroke();
                 ctx.closePath();
-                dot_flag = false;
-            }
-        }
-        if (res == 'up' || res == "out") {
-            flag = false;
-        }
-        if (res == 'move') {
-            if (flag) {
-                prevX = currX;
-                prevY = currY;
-                currX = e.clientX - canvas.offsetLeft - canvasCenterX;
-                currY = e.clientY - canvas.offsetTop - canvasCenterY;
-                drawLine();
-                collectData(currX,currY);
             }
         }
 
-        function drawLine() {
-            ctx.beginPath();
-            ctx.moveTo(prevX, prevY);
-            ctx.lineTo(currX, currY);
-            ctx.strokeStyle = penColor;
-            ctx.lineWidth = thickness;
-            ctx.stroke();
-            ctx.closePath();
+        function logLatLon(lat, lon) {
+            var coords = {
+                lat: lat,
+                lon: lon
+            }
+            if (logToBeforeCorner) {
+                beforeCorner.push(coords);
+            } else {
+                afterCorner.push(coords);
+            }
+            userPath.push(coords)
         }
-    }
-
-    function log(lat, lon) {
-        var coords = {
-            lat: lat,
-            lon: lon
+        function getLatFromCanvasX(x) {
+            return (x / resizeCoefficient) + dataCenterX;
         }
-        userPath.push(coords)
-    }
-    function getLatFromCanvasX(x) {
-        return (x/resizeCoefficient) + dataCenterX;
-    }
-    function getLonFromCanvasY(y) {
-        //important to flip arround y axis
-        //canvas 0 is left-top corner
-        //coordinate 0 is left-bottom corner
-        return -( (y/resizeCoefficient) + dataCenterY );
-    }
-    function collectData(x, y) {
-        var lat = getLatFromCanvasX(x);
-        var lon = getLonFromCanvasY(y);
-        log(lat,lon);
-    }
+        function getLonFromCanvasY(y) {
+            //important to flip arround y axis
+            //canvas 0 is left-top corner
+            //coordinate 0 is left-bottom corner
+            return -( (y / resizeCoefficient) + dataCenterY );
+        }
+        function logXY(x, y) {
+            var lat = getLonFromCanvasY(y);
+            var lon = getLatFromCanvasX(x);
+            logLatLon(lat, lon);
+        }
 
-    function resetLog(){
-        userPath = []
-    }
+        function resetLog() {
+            beforeCorner = [];
+            afterCorner = [];
+            logToBeforeCorner = true;
+            logingAllowed = true;
+            userPath = [];
+        }
     </script>
 
     <!-- show naviterier data -->
@@ -274,15 +299,17 @@
                 var lastX = getXfromCoordinate(points[0]);
                 var lastY = getYfromCoordinate(points[0]);
 
+                ctx.fillStyle = 'black';
                 drawPoint(lastX, lastY);
                 if (points.length > 1) {
                     for (var j = 1; j < points.length; j++) {
                         var x = getXfromCoordinate(points[j]);
                         var y = getYfromCoordinate(points[j]);
+                        ctx.fillStyle = 'black';
                         drawPoint(x, y);
                         ctx.save();
                         if (formOfWay == "Sidewalk") {
-                            ctx.strokeStyle="black";
+                            ctx.strokeStyle = "black";
                         } else if (formOfWay == "Crossway") {
                             ctx.setLineDash([5, 5]);
                             ctx.strokeStyle = "black";
@@ -298,67 +325,81 @@
             }
         }
 
-            function dataToCanvasX(x) {
-                return (x - dataCenterX) * resizeCoefficient;
-            }
+        function dataToCanvasX(x) {
+            return (x - dataCenterX) * resizeCoefficient;
+        }
 
-            function dataToCanvasY(y) {
-                return (y - dataCenterY) * resizeCoefficient;
-            }
+        function dataToCanvasY(y) {
+            return (y - dataCenterY) * resizeCoefficient;
+        }
 
-            function getXfromCoordinate(coordinate) {
-                return coordinate.Longitude;
-            }
+        function getXfromCoordinate(coordinate) {
+            return coordinate.Longitude;
+        }
 
-            //important to flip arround y axis
-            //canvas 0 is left-top corner
-            //coordinate 0 is left-bottom corner
-            function getYfromCoordinate(coordinate) {
-                return -coordinate.Latitude;
-            }
+        //important to flip arround y axis
+        //canvas 0 is left-top corner
+        //coordinate 0 is left-bottom corner
+        function getYfromCoordinate(coordinate) {
+            return -coordinate.Latitude;
+        }
 
-            function canvasDrawPoint(x, y) {
-                var radius = 1;
-                ctx.beginPath();
-                ctx.arc(x, y, radius, 0, 2 * Math.PI, false);
-                ctx.fillStyle = 'green';
-                ctx.lineWidth = 1;
-                ctx.fill();
-                //document.writeln("point at " + penColor +", " + thickness + "<br>")
+        function canvasDrawPoint(x, y) {
+            var radius = 5;
+            ctx.beginPath();
+            ctx.arc(x, y, radius, 0, 2 * Math.PI, false);
 
-            }
+            ctx.lineWidth = 1;
+            ctx.fill();
+            //document.writeln("point at " + penColor +", " + thickness + "<br>")
 
-            function canvasDrawLine(fromX, fromY, toX, toY) {
-                ctx.beginPath();
-                ctx.moveTo(fromX, fromY);
-                ctx.lineTo(toX, toY);
-                ctx.stroke();
-            }
+        }
 
-            function drawPoint(dataX, dataY) {
-                canvasDrawPoint(dataToCanvasX(dataX), dataToCanvasY(dataY));
-            }
+        function canvasDrawLine(fromX, fromY, toX, toY) {
+            ctx.beginPath();
+            ctx.moveTo(fromX, fromY);
+            ctx.lineTo(toX, toY);
+            ctx.stroke();
+        }
 
-            function drawLine(fromDataX, fromDataY, toDataX, toDataY) {
-                canvasDrawLine(dataToCanvasX(fromDataX),
-                    dataToCanvasY(fromDataY),
-                    dataToCanvasX(toDataX),
-                    dataToCanvasY(toDataY));
-            }
+        function drawPoint(dataX, dataY) {
+            canvasDrawPoint(dataToCanvasX(dataX), dataToCanvasY(dataY));
+        }
 
-            function updatedMinimum(min, actual) {
-                if (min > actual) {
-                    return actual;
-                }
-                return min;
-            }
+        function drawLine(fromDataX, fromDataY, toDataX, toDataY) {
+            canvasDrawLine(dataToCanvasX(fromDataX),
+                dataToCanvasY(fromDataY),
+                dataToCanvasX(toDataX),
+                dataToCanvasY(toDataY));
+        }
 
-            function updatedMaximum(max, actual) {
-                if (max < actual) {
-                    return actual;
-                }
-                return max;
+        function updatedMinimum(min, actual) {
+            if (min > actual) {
+                return actual;
             }
+            return min;
+        }
+
+        function updatedMaximum(max, actual) {
+            if (max < actual) {
+                return actual;
+            }
+            return max;
+        }
+
+        function drawEdges(edges) {
+            for (var i = 0; i < edges.length; i++) {
+                drawEdge(edges[i]);
+            }
+        }
+
+        function drawEdge(edge) {
+            var from_X = getXfromCoordinate(edge[0]);
+            var from_Y = getYfromCoordinate(edge[0]);
+            var to_X = getXfromCoordinate(edge[1]);
+            var to_Y = getYfromCoordinate(edge[1]);
+            drawLine(from_X, from_Y, to_X, to_Y);
+        }
 
     </script>
 
@@ -371,16 +412,21 @@
                 var lastX = getXfromCoordinate(points[0]);
                 var lastY = getYfromCoordinate(points[0]);
 
+                ctx.fillStyle = 'green';
                 drawPoint(lastX, lastY);
                 if (points.length > 1) {
                     for (var j = 1; j < points.length; j++) {
                         var x = getXfromCoordinate(points[j]);
                         var y = getYfromCoordinate(points[j]);
+                        ctx.fillStyle = 'green';
                         drawPoint(x, y);
                         ctx.save();
 
-                        ctx.strokeStyle = "red";
+                        ctx.strokeStyle = "green";
                         ctx.lineWidth = 3
+                        if (i%2 == 0) {
+                            ctx.setLineDash([5, 5])
+                        }
 
                         drawLine(lastX, lastY, x, y);
                         ctx.restore();
@@ -396,17 +442,21 @@
     <!-- locate -->
     <script>
         function locate() {
-            //send GPS log
+            //send GPS logLatLon
             var url = "{% url "gpsLocalization:locateMeAPI" %}";
             var post_data = {
-                csrfmiddlewaretoken : "{{ csrf_token }}",
-                userPath : userPath,
+                csrfmiddlewaretoken: "{{ csrf_token }}",
+                userPath: {
+                    beforeCorner: beforeCorner,
+                    afterCorner: afterCorner,
+                },
+                contentType: "application/json; charset=utf-8",
             }
 
             $.ajax({
                 type: "POST",
                 url: url,
-                data: post_data,
+                data: JSON.stringify(post_data),
                 success: function (json) {
                     var object = JSON.parse(json);
                     success_handler(object);
@@ -414,12 +464,18 @@
             });
 
             function success_handler(object) {
-                //receive used sidewalks
-                //draw used sidewalks
-                //tell me last used sidewalk
-                //project last coordinate to  last used sidewalk
-                // tell me the GPS position
-                //draw it on the canvas thick
+                var myPosition = object.userCoordinates;
+                var edges = object.segmentsTraveled;
+
+
+                ctx.fillStyle = 'red';
+                drawPoint(myPosition.lon, -myPosition.lat);
+                ctx.save();
+                ctx.strokeStyle = "red";
+                ctx.lineWidth = 3;
+                drawEdges(edges);
+                ctx.restore();
+
             }
         }
     </script>
