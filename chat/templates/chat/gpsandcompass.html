@@ -91,9 +91,6 @@
     var logingEnabled = false;
     var beforeCorner = true;
 
-    var beforeLog = { "lat": [], "lon":[]};
-    var afterLog = { "lat": [], "lon":[]};
-
     function initGPS() {
         if( "geolocation" in  navigator) {
             showMessageGeolocation("Spouštím GPS a určuji tvou přesnou pozici");
@@ -127,17 +124,20 @@
 
     function logGpsCoords(logingEnabled, lat, lon) {
         function log(lat, lon, object) {
-            object.lat.push(lat);
-            object.lon.push(lon);
+            var coords = {
+                lat: lat,
+                lon: lon
+            }
+            object.push(coords);
         }
 
         if(logingEnabled) {
             if (beforeCorner) {
 
-                log(lat, lon, beforeLog);
+                log(lat, lon, userPath.beforeCorner);
             } else {
 
-                log(lat, lon, afterLog);
+                log(lat, lon, userPath.afterCorner);
             }
         }
     }
@@ -296,31 +296,37 @@
 
     <!-- go to the corner -->
     <script>
-        showMessageBeforeCorner("Jdi dál až na první roh nebo křižovatku");
-        //enable GPS loging
         function startLogingGps(){
+            //enable GPS loging
             beforeCorner = true;
             logingEnabled = true;
+
+            // anounce to user
+            showMessageBeforeCorner("Jdi dál až na první roh nebo křižovatku");
         }
     </script>
 
     <!-- on the corner-->
     <script>
+        showMessageOnCorner("");
         function togleAfterCorner() {
             beforeCorner = false;
+            showMessageOnCorner("pokračuj cca 50 metrů")
         }
-        showMessageOnCorner("");
-        showMessageOnCorner("pokračuj cca 50 metrů")
+
+
     </script>
 
     <!-- after the corner -->
     <script>
-        showMessageAfterCorner("víme tvou přesnou pozici");
+
     </script>
 
     <!-- -->
     <script>
         function whereAmI() {
+            showMessageAfterCorner("získávám přesnou pozici");
+
             logingEnabled = false;
             //send GPS logLatLon
             var url = "{% url "gpsLocalization:locateMeAPI" %}";
@@ -342,6 +348,9 @@
             function success_handler(object) {
                 var myPosition = object.userCoordinates;
                 var edges = object.segmentsTraveled;
+
+                //tell user
+                showMessageAfterCorner("víme tvou přesnou pozici");
             }
         }
 
@@ -351,331 +360,5 @@
     <script>
 
     </script>
-
-
-{#<!-- determine position from GPS -->#}
-{#<script>#}
-{#    function getAddress(e) {#}
-{#        //todo fix gps coordinates#}
-{##}
-{#        // get address from coordinates#}
-{#        $.get(#}
-{#            "{% url 'chat:get_address' %}",#}
-{#            {'lat': coords.Latitude, 'lon': coords.Longitude},#}
-{#            function (data) {#}
-{#                alert('page content: ' + data);#}
-{#            });#}
-{#    }#}
-{##}
-{#</script>#}
-
-<script>
-    {% comment %}
-        var USER_PATH_COLOR = 'green';
-        var MAP_COLOR = 'gray';
-        var map_data;
-        var canvas = document.getElementById('myCanvas');
-
-        var ctx = canvas.getContext('2d');
-        var canvasCenterX = canvas.width / 2;
-        var canvasCenterY = canvas.height / 2;
-        ctx.translate(canvasCenterX, canvasCenterY);
-
-
-        var gpsPostionLog = new Array();
-
-        var dataSpanX;
-        var dataSpanY;
-        var dataCenterX;
-        var dataCenterY;
-        var resizeCoefficient;
-
-        var initialCoords;
-        var RADIUS = 70;
-        var mapSegments;
-
-        var firstRun = true;
-
-        jQuery(document).ready(function () {
-            if ("geolocation" in navigator) {
-                /* geolocation is available */
-                //alert("ok");
-                var watchID = navigator.geolocation.watchPosition(geo_success, geo_error, geo_options);
-            } else {
-                /* geolocation IS NOT available */
-                alert("geolocation not present in browser. Try to turn it on and refresh this page!")
-            }
-        });
-
-        function geo_success(position) {
-            //writeGPScoordinates(position.Accuracy, position.coords.Latitude, position.coords.Longitude);
-
-    //                var coords = {Latitude: 0, Longitude:0, Accuracy:0};
-    //                coords.Latitude = 50.0776564;
-    //                coords.Longitude = 14.4186242;
-            var coords = {Latitude: position.coords.latitude, Longitude:position.coords.longitude, Accuracy: position.Accuracy};
-
-
-            addToLog(coords);
-            initGpsDrawing(coords);
-
-            drawSituation(gpsPostionLog, mapSegments);
-        }
-
-        function geo_error() {
-            alert("Sorry, no position available.");
-        }
-
-        var geo_options = {
-            enableHighAccuracy: true,
-            maximumAge        : 30000,
-            timeout           : 27000
-        };
-
-        function initGpsDrawing(coords) {
-            initialCoords = coords;
-
-            //set center of canvas
-            dataCenterX = getXFromCoords(coords);
-            dataCenterY = getYFromCoords(coords);
-            //set data range
-            dataSpanX = 0.003;
-            dataSpanY = 0.003;
-
-            //scale according to X dimension
-            resizeCoefficient = canvas.width / dataSpanX;
-            //if the Y dimension then won't fit into the Canvas, scale according to Y dimension
-            if (dataSpanY * resizeCoefficient > canvas.height) {
-                resizeCoefficient = canvas.height / dataSpanY;
-            }
-        }
-
-        function clearGps() {
-            gpsPostionLog = new Array();
-        }
-
-        function getXFromCoords(coords) {
-            return coords.Longitude;
-        }
-
-        function getYFromCoords(coords) {
-            return -coords.Latitude;
-        }
-
-        function dataToCanvasX(x) {
-            return (x - dataCenterX) * resizeCoefficient;
-        }
-        function dataToCanvasY(y) {
-            return (y - dataCenterY) * resizeCoefficient;
-        }
-
-        function writeGPScoordinates(Accuracy, lat, lon) {
-            document.writeln(Accuracy + "m - point at " + lat + ", " + lon + "<br>")
-        }
-
-        function addToLog(coords) {
-            gpsPostionLog.push(coords);
-        }
-
-        function dataToCanvasX(x) {
-            return (x - dataCenterX) * resizeCoefficient;
-        }
-        function dataToCanvasY(y) {
-            return (y - dataCenterY) * resizeCoefficient;
-        }
-
-        function drawPoint(dataX, dataY, color) {
-            canvasDrawPoint(dataToCanvasX(dataX), dataToCanvasY(dataY), color);
-        }
-
-        function drawLine(fromDataX, fromDataY, toDataX, toDataY, color) {
-            canvasDrawLine(dataToCanvasX(fromDataX),
-                    dataToCanvasY(fromDataY),
-                    dataToCanvasX(toDataX),
-                    dataToCanvasY(toDataY),
-                    color);
-        }
-
-        function canvasDrawPoint(x, y, color) {
-            var radius = 6;
-            ctx.beginPath();
-            ctx.arc(x, y, radius, 0, 2 * Math.PI, false);
-            ctx.fillStyle = color;
-            ctx.fill();
-            //document.writeln("point at " + x +", " + y + "<br>")
-
-        }
-
-        function canvasDrawLine(fromX, fromY, toX, toY, color) {
-            ctx.beginPath();
-            ctx.moveTo(fromX, fromY);
-            ctx.lineTo(toX, toY);
-            ctx.strokeStyle = color;
-            ctx.stroke();
-        }
-
-        function clearCanvas() {
-            ctx.clearRect(-canvas.width / 2, -canvas.height / 2, canvas.width, canvas.height);
-        }
-
-        function drawPathToCanvas(gpsLog,color) {
-            if (gpsLog.length > 0) {
-                //draw first point
-                var point = gpsLog[0];
-                var lastX = getXFromCoords(point);
-                var lastY = getYFromCoords(point);
-
-                drawPoint(lastX, lastY, color);
-
-                //draw line + next point
-                for (var i = 1; i < gpsLog.length; i++) {
-                    point = gpsLog[i];
-                    var x = getXFromCoords(point);
-                    var y = getYFromCoords(point);
-                    drawPoint(x, y, color);
-                    drawLine(lastX, lastY, x, y, color);
-                    lastX = x;
-                    lastY = y;
-                }
-
-            }
-        }
-
-        function drawSituation(gpsLog,mapSegments) {
-            clearCanvas();
-            drawPathToCanvas(gpsLog,USER_PATH_COLOR);
-            drawMapData(mapSegments);
-        }
-
-        function getMapData(Coords, Radius) {
-            $.get('https://crossorigin.me/http://147.32.81.71/NaviTerier.ProcessingService/json/reply/FindSourceData?Radius='+
-                    Radius+'&SearchOrigin=%7bLatitude:'+Coords.Latitude+',Longitude:'+
-                    Coords.Longitude+'%7d'
-            ).done(function (data) {
-                mapSegments = data.Segments;
-                alert("Map successfully downloaded. It contains: " + mapSegments.length + " items.");
-            }).fail(function () {
-                alert("Failed to obtain Map data from NaviTerier");
-            });
-        }
-
-        function drawMapData(segments) {
-            for (i in segments) {
-                var path = segments[i].Shape.Points;
-                drawPathToCanvas(path,MAP_COLOR);
-            }
-        }
-
-    {% endcomment %}
-
-</script>
-
-
-{% comment %}<!-- COMPASS -->
-<h1>Coole kompas!</h1>
-
-	<div id="notice"></div>
-
-	<div class="compass">
-		<div class="arrow"></div>
-		<div class="disc" id="compassDiscImg"></div>
-	</div>
-
-	<div class="orientation-data">
-		<div>Kantelen voor-achter: <span id="tiltFB"></span></div>
-		<div>Kantelen links-rechts: <span id="tiltLR"></span></div>
-		<div>Richting: <span id="direction"></span></div>
-	</div>
-
-<style>
-@import url('http://fonts.googleapis.com/css?family=Wallpoet');
-
-html, body {
-	margin: 0;
-	padding: 0;
-	height: 100%;
-}
-
-body {
-	margin: 30px;
-	background: rgb(15, 15, 15);
-	color: rgb(134, 254, 25);
-	text-shadow: 0 0 rgba(134, 254, 25, 0.5);
-	font-family: 'Wallpoet', cursive;
-	text-align: center;
-}
-
-.compass {
-	position: relative;
-	width: 260px;
-	height: 260px;
-	margin: 20px auto;
-	background: #222;
-	padding: 20px;
-	border-radius: 40px;
-	border: 5px solid #444;
-	overflow: hidden;
-}
-
-.compass .disc {
-	position: absolute;
-	top: 20px;
-	left: 20px;
-	z-index: 200;
-	background: url('http://dev.rvltn.eu/compass/compass.svg');
-	width: 260px;
-	height: 260px;
-	background-size: 100%;
-}
-
-.compass .arrow {
-	position: absolute;
-	top: 20px;
-	left: 20px;
-	z-index: 1000;
-	background: url('http://dev.rvltn.eu/compass/arrow.svg');
-	width: 260px;
-	height: 260px;
-	background-size: 100%;
-}
-</style>
-
-<script>
-document.addEventListener("DOMContentLoaded", function(event) {
-
-	if (window.DeviceOrientationEvent) {
-  document.getElementById("notice").innerHTML = "Cool! DeviceOrientationEvent API je podporován tímto přístrojem.";
-  window.addEventListener('deviceorientation', function(eventData) {
-  	// gamma: Tilting the device from left to right. Tilting the device to the right will result in a positive value.
-    var tiltLR = eventData.gamma;
-
-    // beta: Tilting the device from the front to the back. Tilting the device to the front will result in a positive value.
-    var tiltFB = eventData.beta;
-
-    // alpha: The direction the compass of the device aims to in degrees.
-    var dir = eventData.alpha
-
-    // Call the function to use the data on the page.
-    deviceOrientationHandler(tiltLR, tiltFB, dir);
-  }, false);
-} else {
-  document.getElementById("notice").innerHTML = "Sorry the compass is not now working in your device"
-};
-
-    function deviceOrientationHandler(tiltLR, tiltFB, dir) {
-      document.getElementById("tiltLR").innerHTML = Math.ceil(tiltLR);
-      document.getElementById("tiltFB").innerHTML = Math.ceil(tiltFB);
-      document.getElementById("direction").innerHTML = Math.ceil(dir);
-
-      // Rotate the disc of the compass.
-      var compassDisc = document.getElementById("compassDiscImg");
-      compassDisc.style.webkitTransform = "rotate("+ dir +"deg)";
-      compassDisc.style.MozTransform = "rotate("+ dir +"deg)";
-      compassDisc.style.transform = "rotate("+ dir +"deg)";
-    }
-
-});
-</script>{% endcomment %}
-
 
 {% endblock %}
