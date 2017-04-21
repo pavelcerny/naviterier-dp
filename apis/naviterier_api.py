@@ -52,7 +52,8 @@ def findRoutes(SourceAddress,TargetAddress):
         # "TargetPoiId":"String",
         "TargetTextInput": TargetAddress,
     }
-    headers = {'content-type': 'application/json'}
+    headers = {'content-type': 'application/json',
+               'Accept-Language': 'cs'}
 
     serialized_data = json.dumps(payload)
     # request naviterier api
