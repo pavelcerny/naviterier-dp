@@ -21,4 +21,5 @@ urlpatterns = [
     # url(r'^admin/', admin.site.urls),
     url(r'^', include('chat.urls', namespace="chat")),
     url(r'^gpstools/', include('gpsLocalization.urls', namespace="gpsLocalization")),
+    url(r'^apis/', include('apis.urls', namespace="apis")),
 ]

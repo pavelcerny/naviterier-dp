@@ -1,14 +1,15 @@
-from gpsLocalization import naviterier_data, myrepresentation
+from gpsLocalization import myrepresentation
+from apis import naviterier_api
 
 
 def getSegments(lat, lon, radius):
-    segments = naviterier_data.getSegments(lat,lon,radius)
+    segments = naviterier_api.findSegments(lat, lon, radius)
 
     return segments
 
 
 def getSidewalkSegments(lat, lon, radius):
-    segments = naviterier_data.getSegments(lat,lon,radius, "Sidewalk")
+    segments = naviterier_api.findSegments(lat, lon, radius, "Sidewalk")
 
     return segments
 

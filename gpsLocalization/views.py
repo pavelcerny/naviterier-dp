@@ -3,7 +3,7 @@ import json
 from django.http import HttpResponse
 from django.views.decorators.csrf import csrf_exempt
 
-from gpsLocalization import naviterier_data, myrepresentation, data
+from gpsLocalization import myrepresentation, data
 from gpsLocalization.functions import locateMe
 from gpsLocalization.myrepresentation import UserPath
 

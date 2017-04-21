@@ -1,5 +1,8 @@
 from django.conf.urls import url
 
+import apis.google_api
+import apis.views
+import apis.watson_api
 from . import views
 
 urlpatterns = [
@@ -16,9 +19,9 @@ urlpatterns = [
 
     # API
     url(r'^process$', views.processUserInput, name='process_request'),
-    url(r'^address-from-gps$', views.getAddress, name='get_address'),
-    url(r'^conversation$', views.watsonResponse, name='watson_response'),
-    url(r'^googlegeocoding$', views.googleGeocodoingAPI, name='google_geo'),
+    url(r'^address-from-gps$', apis.views.getAddressFromGpsAPI, name='get_address'),
+    url(r'^conversation$', apis.views.watsonResponse, name='watson_response'),
+    url(r'^googlegeocoding$', apis.views.getGpsFromAddressAPI, name='google_geo'),
 
 
 
