@@ -39,7 +39,7 @@ def _getLeastDistanceEdges(mapPaths, clustersForPaths, userPath):
         path = mapPaths[p_id]
         clusters = clustersForPaths[p_id]
 
-        for c_id in range(max(clusters)):
+        for c_id in range(max(clusters)+1):
             # for each point traveled by user
             edges = getEdgesInCluster(c_id, clusters, path)
             nextEdges = getEdgesInCluster(c_id + 1, clusters, path)
