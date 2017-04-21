@@ -27,7 +27,18 @@ def reverseGeocoding(request):
 
 
 def navigate(request):
-    return render(request, 'chat/protoFIN-navigate.html')
+    if "TargetAddress" in request.GET:
+        targetAddress = request.GET["TargetAddress"]
+        sourceAddress = request.GET["SourceAddress"]
+    else:
+        targetAddress = "Myslíkova 13"
+        sourceAddress = "Lazarská 5"
+
+    context = {
+        "TargetAddress" : targetAddress,
+        "SourceAddress" : sourceAddress,
+    }
+    return render(request, 'chat/protoFIN-navigate.html', context)
 
 
 def poi(request):

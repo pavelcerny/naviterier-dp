@@ -7,8 +7,6 @@
 
 
 {% block body %}
-{#    <button onclick="getItinerary()">get itinereary</button>#}
-
     <div id="question" aria-live="polite">Načítám dialog...</div>
     <button id="buttonStartJourney" onclick="startJourney()">Jdu na to</button> <br>
     <button id="buttonNextPart" onclick="nextPart()">Další úsek</button> <br>
@@ -17,8 +15,8 @@
     <script src="{% static "js/jquery.js" %}"></script>
 
     <script>
-        var targetAddress = "Myslíkova 14";
-        var sourceAddress = "Lazarská 4";
+        var targetAddress = "{{ SourceAddress }}";
+        var sourceAddress = "{{ TargetAddress }}";
 
         var onTrack = false;
         var currentPart = 0;
