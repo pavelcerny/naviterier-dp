@@ -14,6 +14,10 @@
     <div id="geolocationNotice"></div>
 </section>
 
+    <form>
+        <label for="InputTargetAddress">Adresa cíle</label> <input type="text" id="InputTargetAddress" name="TargetAddress" placeholder="např. Myslíkova 22"/>
+    </form>
+
 <!-- interactive elements -->
 <button onclick="getAddress()">Ukonči zpřesňování a urči chodník</button>
 
@@ -94,6 +98,11 @@
                 alert('page content: ' + data);
                 // todo log gps of address
                 getGPS(data)
+                sourceAddress = data;
+                targetAddress = document.getElementById("InputTargetAddress").value;
+                var sourceEncoded = encodeURIComponent(sourceAddress).replace(/%20/g,'+');
+                var targetEncoded = encodeURIComponent(targetAddress).replace(/%20/g,'+');
+                window.location.replace("{% url 'chat:navigate'%}?SourceAddress="+sourceEncoded+"&TargetAddress="+targetEncoded);
 
 
             });
