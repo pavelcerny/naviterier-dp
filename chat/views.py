@@ -26,6 +26,10 @@ def reverseGeocoding(request):
     return render(request, 'chat/proto01-reverse-geocoding.html')
 
 
+def navigate(request):
+    return render(request, 'chat/protoFIN-navigate.html')
+
+
 def poi(request):
     return render(request, 'chat/proto02-poi-chat.html')
 

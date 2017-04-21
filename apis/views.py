@@ -84,8 +84,8 @@ def getGpsFromAddressAPI(request):
 
 def getTracing(request):
     # unpack
-    sourceAddress = request.POST['TargetAddress']
-    tartgetAddress = request.POST['SourceAddress']
+    sourceAddress = request.GET['TargetAddress']
+    tartgetAddress = request.GET['SourceAddress']
 
     # do
     response = getItinerary(sourceAddress, tartgetAddress)
@@ -115,3 +115,16 @@ def watsonResponse(request):
     text = json.dumps(response)
     request.session['context'] = response['context']
     return HttpResponse(text)
+
+
+@csrf_exempt
+def demo(request):
+    # unpack
+    sourceAddress = "Lazarská 3"
+    tartgetAddress = "Myslíkova 13"
+
+    # do
+    response = getItinerary(sourceAddress, tartgetAddress)
+
+    # pack
+    return HttpResponse(json.dumps(response), content_type="application/json")

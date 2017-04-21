@@ -2,137 +2,115 @@
 {% load static %}
 
 {% block title %}
-    Reverzní geocoding
+    Naviguj
 {% endblock %}
 
 
 {% block body %}
+{#    <button onclick="getItinerary()">get itinereary</button>#}
 
+    <div id="question" aria-live="polite">Ahoj, jak se máš?</div>
+    <button id="buttonStartJourney" onclick="startJourney()">Jdu na to</button> <br>
+    <button id="buttonNextPart" onclick="nextPart()">Další úsek</button> <br>
+    <button id="buttonPreviousPart" onclick="previousPart()">Předchozí úsek</button> <br>
 
-<!-- info for user -->
-<section id="question" aria-live="polite">
-    <div id="geolocationNotice"></div>
-</section>
+    <script src="{% static "js/jquery.js" %}"></script>
 
-<!-- interactive elements -->
-<button onclick="getAddress()">Ukonči zpřesňování a urči chodník</button>
+    <script>
+        var targetAddress = "Myslíkova 14";
+        var sourceAddress = "Lazarská 4";
 
+        var onTrack = false;
+        var currentPart = 0;
+        var itinerary = {}
+    </script>
 
-
-<script src="{% static "js/jquery.js" %}"></script>
-
-
-<!-- GPS init -->
-<script>
-    var coords = null;
-    var int = 0;
-    // init gps
-    jQuery(document).ready(function () {
-        if ("geolocation" in navigator) {
-            /* geolocation is available */
-            showMessageGeolocation("Spouštím GPS a určuji tvou přesnou pozici");
-            var watchID = navigator.geolocation.watchPosition(geo_success, geo_error, geo_options);
-        } else {
-            /* geolocation IS NOT available */
-            showMessageGeolocation("geolocation not present in browser. Try to turn it on and refresh this page!")
-        }
-    });
-
-    function geo_error() {
-        alert("Sorry, no position available.");
-    }
-
-    var geo_options = {
-        enableHighAccuracy: true,
-        maximumAge: 30000,
-        timeout: 27000
-    };
-
-    //localizate
-    function geo_success(position) {
-        coords = {
-            Latitude: position.coords.latitude,
-            Longitude: position.coords.longitude,
-            Accuracy: position.coords.accuracy,
-        };
-        showProgress();
-    }
-
-    //todo anounce progress
-    function showProgress() {
-        //todo when accuracy drops down for at least 10m
-
-        var shownAccuracy = Math.round(coords.Accuracy);
-        if (coords != null) {
-            showMessageGeolocation("aktuální přesnost +-" + shownAccuracy + "m. " + int++);
-        }
-    }
-</script>
-
-<!-- handlers -->
-<script>
-    function showMessage(elementId, message) {
-        document.getElementById(elementId).innerHTML = message;
-    }
-
-    function showMessageGeolocation(message) {
-        showMessage("geolocationNotice", message);
-    }
-</script>
-
-<!-- determine position from GPS -->
-<script>
-    function getAddress(e) {
-        //todo fix gps coordinates
-
-        // get address from coordinates
-        $.get(
-            "{% url 'apis:addressFromGps' %}",
-            {'lat': coords.Latitude, 'lon': coords.Longitude},
+    <!-- get itinerary api -->
+    <script>
+        function getItinerary() {
+            $.get(
+            "{% url 'apis:getTracing' %}",
+            {
+                'TargetAddress':    targetAddress,
+                'SourceAddress':    sourceAddress,
+            },
             function (data) {
-                // todo get address
-                alert('page content: ' + data);
-                // todo log gps of address
-                getGPS(data)
-
-
+                itinerary = data;
+                draw()
             });
-    }
+        }
 
-    function getGPS(address) {
+    </script>
 
-        // get address from coordinates
-        $.get(
-            "{% url 'apis:gpsFromAddress' %}",
-            {'address' : address},
-            function (data) {
-                alert('page content: ' + data);
-            });
-    }
-
-</script>
-
-<!-- On form submit -->
-<script>
-    function handleSubmit() {
-
-        var url = "{% url 'chat:process_request' %}"; // the script where you handle the form input.
-
-        var post_data = {
-            csrfmiddlewaretoken: "{{ csrf_token }}",
-            question: document.getElementById("userReply").value,
-        };
-
-        alert('sending request');
-
-        $.ajax({
-            type: "POST",
-            url: url,
-            data: post_data,
-            success: function (data) {
-                alert(data); // show response from the php script.
+    <!-- buttons events -->
+    <script>
+        function nextPart() {
+            if (currentPart < itinerary['Stages'].length - 1 ) {
+                currentPart++;
+            } else {
+                alert("you can't go further, you are already there");
             }
-        });
-    }
+
+            draw();
+        }
+
+        function previousPart() {
+            if (currentPart == 0) {
+                // back to general description
+                onTrack = false
+            } else {
+                // back to previous part of navigation
+                currentPart--;
+            }
+
+            draw();
+        }
+
+        function startJourney() {
+            onTrack = true;
+            draw();
+        }
+    </script>
+
+    <!-- render logic -->
+    <script>
+        function draw() {
+            var message;
+            if (onTrack) {
+                message = itinerary['Stages'][currentPart];
+                $("#buttonStartJourney").hide();
+                $("#buttonNextPart").show();
+                $("#buttonPreviousPart").show();
+            } else {
+                message = itinerary['GeneralDescription'];
+                $("#buttonStartJourney").show();
+                $("#buttonNextPart").hide();
+                $("#buttonPreviousPart").hide();
+            }
+            displayMessage(message)
+        }
+
+        function displayMessage(message) {
+            document.getElementById("question").innerHTML = message;
+        }
+
+        function show(elementId) {
+            $("#"+elementId).show();
+        }
+
+        function hide(elementId) {
+            $("#item").hide();
+        }
+    </script>
+
+
+<!-- init -->
+<script>
+    $(document).ready(function () {
+        console.log("ready!");
+
+        getItinerary()
+    });
 </script>
+
 {% endblock %}
