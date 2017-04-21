@@ -10,6 +10,9 @@
 {% block body %}
 
 <!-- info for user -->
+     <form>
+        <label for="InputTargetAddress">Adresa cíle</label> <input type="text" id="InputTargetAddress" name="TargetAddress" placeholder="např. Myslíkova 22"/>
+    </form>
 <!-- compass info -->
 <div id="compassNotice"></div>
 
@@ -31,10 +34,12 @@
 </div>
 
 <!-- interactive elements -->
-<form onsubmit="event.preventDefault(); getGpsCoords();">
+{% comment %}<form onsubmit="event.preventDefault(); getGpsCoords();">
     <input id="inputTargetAddress" value="I.P. Pavlova">
     <input type="submit" value="Get GPS coords">
-</form>
+</form>{% endcomment %}
+
+    <button onclick="getGpsCoords()">Get GPS coords</button>
 
 
 <div id="targetNotice"></div>
@@ -53,7 +58,7 @@
     <button onclick="togleAfterCorner()">jsem na rohu</button>
     <div id="onCorner"></div>
     <div id="afterCorner"></div>
-    <button onclick="whereAmI()">urči mou pozici</button>
+    <button onclick="whereAmI()">urči mou pozici & zahaj navigaci</button>
 
 {#    <button onclick="whereToGo()">Stojím zády k budově</button>#}
 
@@ -133,11 +138,11 @@
 
         if(logingEnabled) {
             if (beforeCorner) {
-
                 log(lat, lon, userPath.beforeCorner);
+                showMessageBeforeCorner("Jdi dál až na první roh nebo křižovatku (" + userPath.beforeCorner.length + ")");
             } else {
-
                 log(lat, lon, userPath.afterCorner);
+                showMessageOnCorner("pokračuj cca 50 metrů (" + userPath.afterCorner.length + ")");
             }
         }
     }
@@ -222,7 +227,7 @@
 <!-- get address and coords -->
 <script>
     function getGpsCoords() {
-        var address = document.getElementById("inputTargetAddress").value;
+        var address = document.getElementById("InputTargetAddress").value;
         var url = "{% url 'chat:google_geo' %}";
 
         var get_data = {
@@ -236,7 +241,7 @@
             data: get_data,
             success: function (json) {
                 object = JSON.parse(json);
-                targetGpsHandler(object.lat,object.lng)
+                targetGpsHandler(object.lat,object.lon)
             },
         });
     }
@@ -343,6 +348,10 @@
                     var object = JSON.parse(json);
                     success_handler(object);
                 },
+                error: function(XMLHttpRequest, textStatus, errorThrown) {
+                    alert("Status: " + textStatus); alert("Error: " + errorThrown);
+                    getAddress(50.076927, 14.419260);
+                }
             });
 
             function success_handler(object) {
@@ -351,6 +360,9 @@
 
                 //tell user
                 showMessageAfterCorner("víme tvou přesnou pozici");
+
+                getAddress(myPosition.lat,myPosition.lon);
+
             }
         }
 
@@ -358,6 +370,26 @@
 
     <!-- -->
     <script>
+
+        function getAddress(lat,lon) {
+
+        // get address from coordinates
+        $.get(
+            "{% url 'apis:addressFromGps' %}",
+            {'lat': lat, 'lon': lon},
+            function (data) {
+
+                var sourceAddress = data;
+                var targetAddress = document.getElementById("InputTargetAddress").value;
+                startNavigation(sourceAddress,targetAddress);
+            });
+        }
+
+        function startNavigation(sourceAddress, targetAddress) {
+            var sourceEncoded = encodeURIComponent(sourceAddress).replace(/%20/g, '+');
+            var targetEncoded = encodeURIComponent(targetAddress).replace(/%20/g, '+');
+            window.location.replace("{% url 'chat:navigate'%}?SourceAddress=" + sourceEncoded + "&TargetAddress=" + targetEncoded);
+        }
 
     </script>
 
