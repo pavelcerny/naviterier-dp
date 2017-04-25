@@ -10,6 +10,10 @@ def index_html(request):
     return render(request, 'chat/index.html', {})
 
 
+def navigate(request):
+    return render(request, 'chat/naviterierCurrent.html', {})
+
+
 def chat_with_history(request):
     return render(request, 'chat/whistory.html', {})
 
@@ -26,7 +30,7 @@ def reverseGeocoding(request):
     return render(request, 'chat/proto01-reverse-geocoding.html')
 
 
-def navigate(request):
+def navigateExample(request):
     if "TargetAddress" in request.GET:
         targetAddress = request.GET["TargetAddress"]
         sourceAddress = request.GET["SourceAddress"]
@@ -42,6 +46,9 @@ def navigate(request):
 
 
 def poi(request):
+    #reset session
+    request.session['context']={}
+
     return render(request, 'chat/proto02-poi-chat.html')
 
 

@@ -4,11 +4,8 @@ from django.http import HttpResponse
 from django.views.decorators.csrf import csrf_exempt
 
 from apis import google_api, naviterier_api
-from apis.naviterier_api import findRoutes, getAddresses, getItinerary
-from apis.watson_api import conversation
-
-NAVITERIER_SERVER = "http://147.32.81.71/NaviTerier.ProcessingService"
-NAVITERIER_URL = NAVITERIER_SERVER + "/json/reply"
+from apis.naviterier_api import findRoutes, getItinerary
+from apis.watson_api import conversation, WORKSPACE_ID
 
 
 @csrf_exempt
@@ -104,7 +101,8 @@ def watsonResponse(request):
     if ('text' in request.POST):
         text = request.POST['text']
 
-    workspace_id = 'e3101b6f-4808-4630-afbe-b07744997c20'
+    # workspace_id = 'e3101b6f-4808-4630-afbe-b07744997c20'
+    workspace_id = WORKSPACE_ID
 
     response = conversation.message(
         workspace_id=workspace_id,

@@ -6,4 +6,4 @@ conversation = ConversationV1(
   version='2017-02-03'
 )
 
-
+WORKSPACE_ID = '225b2116-9727-4572-8fd4-4e4c1c69a0ed'

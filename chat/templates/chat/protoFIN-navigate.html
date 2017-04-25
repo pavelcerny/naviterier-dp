@@ -19,6 +19,7 @@
         var sourceAddress = "{{ TargetAddress }}";
 
         var onTrack = false;
+        var reachedTarget = false;
         var currentPart = 0;
         var itinerary = {}
     </script>
@@ -45,6 +46,9 @@
         function nextPart() {
             if (currentPart < itinerary['Stages'].length - 1 ) {
                 currentPart++;
+                if (currentPart == itinerary['Stages'].length - 1) {
+                    reachedTarget = true;
+                }
             } else {
                 alert("you can't go further, you are already there");
             }
@@ -60,6 +64,7 @@
                 // back to previous part of navigation
                 currentPart--;
             }
+            reachedTarget = false;
 
             draw();
         }
@@ -77,8 +82,12 @@
             if (onTrack) {
                 message = itinerary['Stages'][currentPart];
                 $("#buttonStartJourney").hide();
-                $("#buttonNextPart").show();
                 $("#buttonPreviousPart").show();
+                if (reachedTarget){
+                    $("#buttonNextPart").hide();
+                } else {
+                    $("#buttonNextPart").show();
+                }
             } else {
                 message = itinerary['GeneralDescription'];
                 $("#buttonStartJourney").show();

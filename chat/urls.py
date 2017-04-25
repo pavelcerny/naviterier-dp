@@ -15,6 +15,7 @@ urlpatterns = [
     url(r'^gps$', views.gpsAndCompass, name='gpsandcompass'),
     url(r'^showcompass$', views.showCompass, name='showCompass'),
     url(r'^clicker$', views.mapClicker, name='clicker'),
+    url(r'^navigateExample$', views.navigateExample, name='navigateExample'),
     url(r'^navigate$', views.navigate, name='navigate'),
 
 

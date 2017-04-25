@@ -1,0 +1,50 @@
+{% extends 'chat/basetemplate.html' %}
+{% load static %}
+
+{% block title %}
+    Navigování
+{% endblock %}
+
+
+{% block body %}
+
+
+<!-- info for user -->
+<section id="question" aria-live="polite">
+    <div id="geolocationNotice"></div>
+</section>
+
+    <form>
+        <label for="InputSourceAddress">Adresa počátku</label> <br><input type="text" id="InputSourceAddress" name="SourceAddress" placeholder="např. Vodičkova 13"/>
+        <br><label for="InputTargetAddress">Adresa cíle</label><br> <input type="text" id="InputTargetAddress" name="TargetAddress" placeholder="např. Myslíkova 22"/>
+    </form>
+<br>
+<!-- interactive elements -->
+<button onclick="processForm()">zahaj navigaci</button>
+
+
+
+<script src="{% static "js/jquery.js" %}"></script>
+
+    <script>
+
+        function processForm() {
+            var targetAddress = document.getElementById("InputTargetAddress").value;
+            var sourceAddress = document.getElementById("InputSourceAddress").value;
+            if (targetAddress == "") {
+                alert('fill in target address');
+            } else if (sourceAddress == "") {
+                alert("fill in source address");
+            } else {
+                redirectToNavigation(sourceAddress,targetAddress);
+            }
+
+        }
+
+        function redirectToNavigation(sourceAddress,targetAddress) {
+            var sourceEncoded = encodeURIComponent(sourceAddress).replace(/%20/g, '+');
+            var targetEncoded = encodeURIComponent(targetAddress).replace(/%20/g, '+');
+            window.location.replace("{% url 'chat:navigateExample'%}?SourceAddress=" + sourceEncoded + "&TargetAddress=" + targetEncoded);
+        }
+    </script>
+{% endblock %}

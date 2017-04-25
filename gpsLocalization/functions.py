@@ -4,6 +4,7 @@ from gpsLocalization import data
 from mathfunctions.functions import getAngleOfTwoSegments, dist2
 from mathfunctions import functions
 
+TRESHOLD_ANGLE = 140
 
 def _getClosestEdge(point, edges):
     minDist = math.inf
@@ -133,7 +134,7 @@ def _clusterPath(sidewalk):
 
         #declare if next is from different cluster
         angle = getAngleOfTwoSegments(s, s_next)
-        if angle < 140:
+        if angle < TRESHOLD_ANGLE:
             label+=1
         else:
             labels = _uniteLastWithFirst(START_LABEL, label, labels)

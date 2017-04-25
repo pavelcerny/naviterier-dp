@@ -86,6 +86,11 @@
 
 <!-- determine position from GPS -->
 <script>
+    function redirectToNavigation(sourceAddress,targetAddress) {
+        var sourceEncoded = encodeURIComponent(sourceAddress).replace(/%20/g, '+');
+        var targetEncoded = encodeURIComponent(targetAddress).replace(/%20/g, '+');
+        window.location.replace("{% url 'chat:navigateExample'%}?SourceAddress=" + sourceEncoded + "&TargetAddress=" + targetEncoded);
+    }
     function getAddress(e) {
         //todo fix gps coordinates
 
@@ -100,9 +105,7 @@
                 getGPS(data)
                 sourceAddress = data;
                 targetAddress = document.getElementById("InputTargetAddress").value;
-                var sourceEncoded = encodeURIComponent(sourceAddress).replace(/%20/g,'+');
-                var targetEncoded = encodeURIComponent(targetAddress).replace(/%20/g,'+');
-                window.location.replace("{% url 'chat:navigate'%}?SourceAddress="+sourceEncoded+"&TargetAddress="+targetEncoded);
+                redirectToNavigation(sourceAddress,targetAddress);
 
 
             });

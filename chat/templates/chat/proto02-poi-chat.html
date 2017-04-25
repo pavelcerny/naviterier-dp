@@ -62,7 +62,42 @@
 <script>
     var dialogContext = '';
     var dialogQuestion = '';
+    var done = false;
+    var methodMhd = false;
 
+    function isDone(output) {
+        if (output.done === 'undefined') {
+            return false;
+        } else {
+            return output.done;
+        }
+    }
+    function displayGeolocationDone(done,methodMhd, context) {
+        if (done){
+            details = {
+                "TargetLandregistryNumber" : context.TargetLandregistryNumber,
+                "TargetStreet" : context.TargetStreet,
+            }
+
+            if (methodMhd) {
+                details["StartLineDirection"] = context.StartLineDirection;
+                details["StartLineNumber"] = context.StartLineNumber;
+                details["StartStopName"] = context.StartStopName;
+            } else {
+                details["StartStreet"] = context.StartStreet;
+                details["StartLandregistryNumber"] = context.StartLandregistryNumber;
+
+            }
+            alert(JSON.stringify(details));
+        }
+    }
+    function isMethodMhd(output) {
+        if (output.methodMhd === 'undefined') {
+            return false;
+        } else {
+            return output.methodMhd;
+        }
+    }
     function textWatson(userText, context) {
         var url = "{% url 'chat:watson_response' %}";
         var post_data = {
@@ -79,7 +114,10 @@
                 var response = JSON.parse(data);
                 dialogContext = response.context;
                 dialogQuestion = response.output.text;
+                done = isDone(response.output);
+                methodMhd = isMethodMhd(response.output);
                 displayMessage(dialogQuestion);
+                displayGeolocationDone(done, methodMhd, response.context);
             }
         })
     }

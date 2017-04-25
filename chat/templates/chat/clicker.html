@@ -55,9 +55,9 @@
                 data: get_data,
                 success: function (json) {
                     var object = JSON.parse(json);
-                    gpsCoordinatesHandler(object.lat, object.lng);
-                    var details = getMapDetails(object.lat, object.lng, radius);
-                    var groups = getSidewalksDetails(object.lat, object.lng, radius);
+                    gpsCoordinatesHandler(object.lat, object.lon);
+                    var details = getMapDetails(object.lat, object.lon, radius);
+                    var groups = getSidewalksDetails(object.lat, object.lon, radius);
                 },
             });
         }
