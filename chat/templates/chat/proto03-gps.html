@@ -388,9 +388,465 @@
         function startNavigation(sourceAddress, targetAddress) {
             var sourceEncoded = encodeURIComponent(sourceAddress).replace(/%20/g, '+');
             var targetEncoded = encodeURIComponent(targetAddress).replace(/%20/g, '+');
-            window.location.replace("{% url 'chat:navigateExample'%}?SourceAddress=" + sourceEncoded + "&TargetAddress=" + targetEncoded);
+
+            var url = "{% url 'chat:navigateExample'%}?SourceAddress=" + sourceEncoded + "&TargetAddress=" + targetEncoded
+            //window.location.replace(url);
+            openInNewTab(url);
+        }
+
+        function openInNewTab(url) {
+            var win = window.open(url, '_blank');
+            win.focus();
         }
 
     </script>
+
+
+
+
+    <!--- DRAW TO MAP --->
+    <section>
+        <canvas id="myCanvas" width="720" height="720"
+                style="border:1px solid #c3c3c3;">
+            Your browser does not support the canvas element.
+        </canvas>
+
+{#        <input type="button" value="clear" id="clr" size="23" onclick="erase()">#}
+{#        <input type="button" value="where am I?" id="clr" size="23" onclick="locate()">#}
+
+    </section>
+
+    <!-- get address and coords -->
+    <script>
+        var map_data;
+        var radius = 70;
+        var lat;
+        var lon;
+
+        function getGpsCoords() {
+                    var last_coords = userPath.beforeCorner[userPath.beforeCorner.length-1];
+                    lat = last_coords.lat;
+                    lon = last_coords.lon;
+                    var details = getMapDetails(lat, lon, radius);
+                    var groups = getSidewalksDetails(lat, lon, radius);
+        }
+
+        function getMapDetails(lat, lon, radius) {
+            // var url = "{% url "gpsLocalization:getSidewalks" %}";
+            var url = "{% url "gpsLocalization:getSegments" %}";
+            var post_data = {
+                csrfmiddlewaretoken: "{{ csrf_token }}",
+                lat: lat,
+                lon: lon,
+                radius: radius,
+            }
+            // get details
+            $.ajax({
+                type: "POST",
+                url: url,
+                data: post_data,
+                success: function (data) {
+                    map_data = data;
+                    clearCanvas(canvas);
+                    drawMap(map_data);
+                },
+            });
+        }
+
+        function getSidewalksDetails(lat, lon, radius) {
+            var url = "{% url "gpsLocalization:getSidewalksGrouped" %}";
+            var post_data = {
+                csrfmiddlewaretoken: "{{ csrf_token }}",
+                lat: lat,
+                lon: lon,
+                radius: radius,
+            }
+            // get details
+            $.ajax({
+                type: "POST",
+                url: url,
+                data: post_data,
+                success: function (data) {
+                    drawSidewalksPoints(data);
+                },
+            });
+        }
+
+        function clearCanvas(canvas) {
+            ctx.clearRect(-canvas.width / 2, -canvas.height / 2, canvas.width, canvas.height);
+        }
+
+    </script>
+
+   {% comment %}
+   NOT NEEDED IF I AM RIGHT
+   <!-- collect data from clicking -->
+    <script type="text/javascript">
+
+        var userPath = [];
+        var beforeCorner = [];
+        var afterCorner = [];
+        var logingAllowed = true;
+        var logToBeforeCorner = true;
+
+
+        document.addEventListener("DOMContentLoaded", function (event) {
+            init();
+        });
+
+        var flag = false,
+            prevX = 0,
+            currX = 0,
+            prevY = 0,
+            currY = 0,
+            dot_flag = false;
+
+        var penColor = "grey",
+            thickness = 2;
+
+        function init() {
+            canvas.addEventListener("mousemove", function (e) {
+                findxy('move', e)
+            }, false);
+            canvas.addEventListener("mousedown", function (e) {
+                findxy('down', e)
+            }, false);
+            canvas.addEventListener("mouseup", function (e) {
+                findxy('up', e)
+            }, false);
+            canvas.addEventListener("mouseout", function (e) {
+                findxy('out', e)
+            }, false);
+        }
+
+
+        function erase() {
+            var m = confirm("Want to clear");
+            if (m) {
+                clearCanvas(canvas);
+                resetLog();
+            }
+        }
+
+        function findxy(res, e) {
+            if (res == 'down') {
+                if (logingAllowed) {
+                    prevX = currX;
+                    prevY = currY;
+                    currX = e.clientX - canvas.offsetLeft - canvasCenterX + $(window).scrollLeft();
+                    currY = e.clientY - canvas.offsetTop - canvasCenterY + $(window).scrollTop();
+
+                    flag = true;
+                    dot_flag = true;
+                    if (dot_flag) {
+                        ctx.beginPath();
+                        ctx.fillStyle = penColor;
+                        ctx.fillRect(currX, currY, 2, 2);
+                        ctx.closePath();
+                        dot_flag = false;
+                    }
+                } else {
+                    alert('data are already loged, try to reset')
+                }
+            }
+            if (res == 'up' || res == "out") {
+                flag = false;
+                if (logToBeforeCorner) {
+                    logToBeforeCorner = false;
+                } else {
+                    logingAllowed = false;
+                }
+            }
+            if (res == 'move') {
+                if (flag) {
+                    prevX = currX;
+                    prevY = currY;
+                    currX = e.clientX - canvas.offsetLeft - canvasCenterX + $(window).scrollLeft();
+                    currY = e.clientY - canvas.offsetTop - canvasCenterY + $(window).scrollTop();
+                    drawLine();
+                    logXY(currX, currY);
+                }
+            }
+
+
+            function drawLine() {
+                ctx.beginPath();
+                ctx.moveTo(prevX, prevY);
+                ctx.lineTo(currX, currY);
+                ctx.strokeStyle = penColor;
+                ctx.lineWidth = thickness;
+                ctx.stroke();
+                ctx.closePath();
+            }
+        }
+
+        function logLatLon(lat, lon) {
+            var coords = {
+                lat: lat,
+                lon: lon
+            }
+            if (logToBeforeCorner) {
+                beforeCorner.push(coords);
+            } else {
+                afterCorner.push(coords);
+            }
+            userPath.push(coords)
+        }
+        function getLatFromCanvasX(x) {
+            return (x / resizeCoefficient) + dataCenterX;
+        }
+        function getLonFromCanvasY(y) {
+            //important to flip arround y axis
+            //canvas 0 is left-top corner
+            //coordinate 0 is left-bottom corner
+            return -( (y / resizeCoefficient) + dataCenterY );
+        }
+        function logXY(x, y) {
+            var lat = getLonFromCanvasY(y);
+            var lon = getLatFromCanvasX(x);
+            logLatLon(lat, lon);
+        }
+
+        function resetLog() {
+            beforeCorner = [];
+            afterCorner = [];
+            logToBeforeCorner = true;
+            logingAllowed = true;
+            userPath = [];
+        }
+    </script>
+{% endcomment %}
+    
+    <!-- show naviterier data -->
+    <script>
+        var map_data;
+        var canvas = document.getElementById('myCanvas');
+
+        var ctx = canvas.getContext('2d');
+        var canvasCenterX = canvas.width / 2;
+        var canvasCenterY = canvas.height / 2;
+        ctx.translate(canvasCenterX, canvasCenterY);
+
+        var resizeCoefficient, dataSpanX, dataSpanY, dataCenterX, dataCenterY;
+
+        function drawMap(segments) {
+            var dataMinX = 999999999999999;
+            var dataMinY = 999999999999999;
+            var dataMaxX = -99999999999999;
+            var dataMaxY = -99999999999999;
+
+            for (var i in segments) {
+                var points = segments[i].Shape.Points;
+                for (j in points) {
+                    var x = getXfromCoordinate(points[j]);
+                    var y = getYfromCoordinate(points[j]);
+                    dataMinX = updatedMinimum(dataMinX, x);
+                    dataMinY = updatedMinimum(dataMinY, y);
+                    dataMaxX = updatedMaximum(dataMaxX, x);
+                    dataMaxY = updatedMaximum(dataMaxY, y);
+                }
+            }
+
+            dataSpanX = dataMaxX - dataMinX;
+            dataSpanY = dataMaxY - dataMinY;
+            dataCenterX = dataMinX + dataSpanX / 2;
+            dataCenterY = dataMinY + dataSpanY / 2;
+
+            //scale according to X dimension
+            resizeCoefficient = canvas.width / dataSpanX;
+            //if the Y dimension then won't fit into the Canvas, scale according to Y dimension
+            if (dataSpanY * resizeCoefficient > canvas.height) {
+                resizeCoefficient = canvas.height / dataSpanY;
+            }
+
+            for (i in segments) {
+                var points = segments[i].Shape.Points;
+                var formOfWay = segments[i].FormOfWay;
+                var lastX = getXfromCoordinate(points[0]);
+                var lastY = getYfromCoordinate(points[0]);
+
+                ctx.fillStyle = 'black';
+                drawPoint(lastX, lastY);
+                if (points.length > 1) {
+                    for (var j = 1; j < points.length; j++) {
+                        var x = getXfromCoordinate(points[j]);
+                        var y = getYfromCoordinate(points[j]);
+                        ctx.fillStyle = 'black';
+                        drawPoint(x, y);
+                        ctx.save();
+                        if (formOfWay == "Sidewalk") {
+                            ctx.strokeStyle = "black";
+                        } else if (formOfWay == "Crossway") {
+                            ctx.setLineDash([5, 5]);
+                            ctx.strokeStyle = "black";
+                        } else {
+                            ctx.strokeStyle = "grey";
+                        }
+                        drawLine(lastX, lastY, x, y);
+                        ctx.restore();
+                        lastX = x;
+                        lastY = y;
+                    }
+                }
+            }
+        }
+
+        function dataToCanvasX(x) {
+            return (x - dataCenterX) * resizeCoefficient;
+        }
+
+        function dataToCanvasY(y) {
+            return (y - dataCenterY) * resizeCoefficient;
+        }
+
+        function getXfromCoordinate(coordinate) {
+            return coordinate.Longitude;
+        }
+
+        //important to flip arround y axis
+        //canvas 0 is left-top corner
+        //coordinate 0 is left-bottom corner
+        function getYfromCoordinate(coordinate) {
+            return -coordinate.Latitude;
+        }
+
+        function canvasDrawPoint(x, y) {
+            var radius = 5;
+            ctx.beginPath();
+            ctx.arc(x, y, radius, 0, 2 * Math.PI, false);
+
+            ctx.lineWidth = 1;
+            ctx.fill();
+            //document.writeln("point at " + penColor +", " + thickness + "<br>")
+
+        }
+
+        function canvasDrawLine(fromX, fromY, toX, toY) {
+            ctx.beginPath();
+            ctx.moveTo(fromX, fromY);
+            ctx.lineTo(toX, toY);
+            ctx.stroke();
+        }
+
+        function drawPoint(dataX, dataY) {
+            canvasDrawPoint(dataToCanvasX(dataX), dataToCanvasY(dataY));
+        }
+
+        function drawLine(fromDataX, fromDataY, toDataX, toDataY) {
+            canvasDrawLine(dataToCanvasX(fromDataX),
+                dataToCanvasY(fromDataY),
+                dataToCanvasX(toDataX),
+                dataToCanvasY(toDataY));
+        }
+
+        function updatedMinimum(min, actual) {
+            if (min > actual) {
+                return actual;
+            }
+            return min;
+        }
+
+        function updatedMaximum(max, actual) {
+            if (max < actual) {
+                return actual;
+            }
+            return max;
+        }
+
+        function drawEdges(edges) {
+            for (var i = 0; i < edges.length; i++) {
+                drawEdge(edges[i]);
+            }
+        }
+
+        function drawEdge(edge) {
+            var from_X = getXfromCoordinate(edge[0]);
+            var from_Y = getYfromCoordinate(edge[0]);
+            var to_X = getXfromCoordinate(edge[1]);
+            var to_Y = getYfromCoordinate(edge[1]);
+            drawLine(from_X, from_Y, to_X, to_Y);
+        }
+
+    </script>
+
+    <!-- group sidewalks -->
+    <script>
+
+        function drawSidewalksPoints(sidewalksPoints) {
+            for (i in sidewalksPoints) {
+                var points = sidewalksPoints[i];
+                var lastX = getXfromCoordinate(points[0]);
+                var lastY = getYfromCoordinate(points[0]);
+
+                ctx.fillStyle = 'green';
+                drawPoint(lastX, lastY);
+                if (points.length > 1) {
+                    for (var j = 1; j < points.length; j++) {
+                        var x = getXfromCoordinate(points[j]);
+                        var y = getYfromCoordinate(points[j]);
+                        ctx.fillStyle = 'green';
+                        drawPoint(x, y);
+                        ctx.save();
+
+                        ctx.strokeStyle = "green";
+                        ctx.lineWidth = 3
+                        if (i%2 == 0) {
+                            ctx.setLineDash([5, 5])
+                        }
+
+                        drawLine(lastX, lastY, x, y);
+                        ctx.restore();
+                        lastX = x;
+                        lastY = y;
+                    }
+                }
+            }
+        }
+
+    </script>
+
+    <!-- locate -->
+    <script>
+        function locate() {
+            //send GPS logLatLon
+            var url = "{% url "gpsLocalization:locateMeAPI" %}";
+            var post_data = {
+                csrfmiddlewaretoken: "{{ csrf_token }}",
+                userPath: {
+                    beforeCorner: beforeCorner,
+                    afterCorner: afterCorner,
+                },
+                contentType: "application/json; charset=utf-8",
+            }
+
+            $.ajax({
+                type: "POST",
+                url: url,
+                data: JSON.stringify(post_data),
+                success: function (json) {
+                    var object = JSON.parse(json);
+                    success_handler(object);
+                },
+            });
+
+            function success_handler(object) {
+                var myPosition = object.userCoordinates;
+                var edges = object.segmentsTraveled;
+
+
+                ctx.fillStyle = 'red';
+                drawPoint(myPosition.lon, -myPosition.lat);
+                ctx.save();
+                ctx.strokeStyle = "red";
+                ctx.lineWidth = 3;
+                drawEdges(edges);
+                ctx.restore();
+
+            }
+        }
+    </script>
+
+
+    <!--- END DRAW TO MAP -->
 
 {% endblock %}
