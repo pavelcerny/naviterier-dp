@@ -616,7 +616,7 @@
         }
     </script>
 {% endcomment %}
-    
+
     <!-- show naviterier data -->
     <script>
         var map_data;
@@ -812,10 +812,7 @@
             var url = "{% url "gpsLocalization:locateMeAPI" %}";
             var post_data = {
                 csrfmiddlewaretoken: "{{ csrf_token }}",
-                userPath: {
-                    beforeCorner: beforeCorner,
-                    afterCorner: afterCorner,
-                },
+                userPath: userPath,
                 contentType: "application/json; charset=utf-8",
             }
 
