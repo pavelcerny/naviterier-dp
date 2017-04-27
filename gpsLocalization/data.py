@@ -47,7 +47,7 @@ def _mergePathsOneStep(paths):
         # sort into correct group
         for i in range(0, len(groups)):
             # start == start
-            if groups[i][0] == s[0]:
+            if _equals(groups[i][0], s[0]):
                 # reverse s
                 rev_s = s[::-1]
                 # prepend without last
@@ -55,19 +55,19 @@ def _mergePathsOneStep(paths):
                 createNew = False
                 break
             # start == end
-            elif groups[i][0] == s[-1]:
+            elif _equals(groups[i][0], s[-1]):
                 # prepend without last
                 groups[i] = s[:-1] + groups[i]
                 createNew = False
                 break
             # end == start
-            elif groups[i][-1] == s[0]:
+            elif _equals(groups[i][-1], s[0]):
                 # append without first
                 groups[i] = groups[i] + s[1:]
                 createNew = False
                 break
             # end == end
-            elif groups[i][-1] == s[-1]:
+            elif _equals(groups[i][-1], s[-1]):
                 # reverse s
                 rev_s = s[::-1]
                 # append without first
@@ -79,3 +79,17 @@ def _mergePathsOneStep(paths):
             groups.append(s)
 
     return groups
+
+
+def _equals(a, b):
+    """ chcek if coords a and b, equals with the precision DIGITS places"""
+    DIGITS = 7
+    rounded_no = {
+        "Latitude" : round(a["Latitude"], DIGITS),
+        "Longitude": round(a["Longitude"], DIGITS)
+    }
+    rounded_des = {
+        "Latitude" : round(b["Latitude"], DIGITS),
+        "Longitude": round(b["Longitude"], DIGITS)
+    }
+    return  rounded_no == rounded_des
