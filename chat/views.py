@@ -42,7 +42,7 @@ def navigateExample(request):
         "TargetAddress" : targetAddress,
         "SourceAddress" : sourceAddress,
     }
-    return render(request, 'chat/protoFIN-navigate.html', context)
+    return render(request, 'chat/protoFIN-navigate-adressToAddress.html', context)
 
 
 def poi(request):
