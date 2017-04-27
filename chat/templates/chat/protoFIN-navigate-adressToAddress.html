@@ -1,31 +1,13 @@
-{% extends 'chat/basetemplate.html' %}
+{% extends 'chat/protoFIN-navigate-basetemplate.html' %}
 {% load static %}
 
-{% block title %}
-    Naviguj
-{% endblock %}
 
-
-{% block body %}
-    <div id="question" aria-live="polite">Načítám dialog...</div>
-    <button id="buttonStartJourney" onclick="startJourney()">Jdu na to</button> <br>
-    <button id="buttonNextPart" onclick="nextPart()">Další úsek</button> <br>
-    <button id="buttonPreviousPart" onclick="previousPart()">Předchozí úsek</button> <br>
-
-    <script src="{% static "js/jquery.js" %}"></script>
-
+    <!-- get itinerary api -->
+{% block get_itinerary_script %}
     <script>
         var targetAddress = "{{ TargetAddress }}";
         var sourceAddress = "{{ SourceAddress }}";
 
-        var onTrack = false;
-        var reachedTarget = false;
-        var currentPart = 0;
-        var itinerary = {}
-    </script>
-
-    <!-- get itinerary api -->
-    <script>
         function getItinerary() {
             $.get(
             "{% url 'apis:getTracing' %}",
@@ -40,84 +22,4 @@
         }
 
     </script>
-
-    <!-- buttons events -->
-    <script>
-        function nextPart() {
-            if (currentPart < itinerary['Stages'].length - 1 ) {
-                currentPart++;
-                if (currentPart == itinerary['Stages'].length - 1) {
-                    reachedTarget = true;
-                }
-            } else {
-                alert("you can't go further, you are already there");
-            }
-
-            draw();
-        }
-
-        function previousPart() {
-            if (currentPart == 0) {
-                // back to general description
-                onTrack = false
-            } else {
-                // back to previous part of navigation
-                currentPart--;
-            }
-            reachedTarget = false;
-
-            draw();
-        }
-
-        function startJourney() {
-            onTrack = true;
-            draw();
-        }
-    </script>
-
-    <!-- render logic -->
-    <script>
-        function draw() {
-            var message;
-            if (onTrack) {
-                message = itinerary['Stages'][currentPart];
-                $("#buttonStartJourney").hide();
-                $("#buttonPreviousPart").show();
-                if (reachedTarget){
-                    $("#buttonNextPart").hide();
-                } else {
-                    $("#buttonNextPart").show();
-                }
-            } else {
-                message = itinerary['GeneralDescription'];
-                $("#buttonStartJourney").show();
-                $("#buttonNextPart").hide();
-                $("#buttonPreviousPart").hide();
-            }
-            displayMessage(message)
-        }
-
-        function displayMessage(message) {
-            document.getElementById("question").innerHTML = message;
-        }
-
-        function show(elementId) {
-            $("#"+elementId).show();
-        }
-
-        function hide(elementId) {
-            $("#item").hide();
-        }
-    </script>
-
-
-<!-- init -->
-<script>
-    $(document).ready(function () {
-        console.log("ready!");
-
-        getItinerary()
-    });
-</script>
-
 {% endblock %}
