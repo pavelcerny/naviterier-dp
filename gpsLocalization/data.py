@@ -9,7 +9,7 @@ def getSegments(lat, lon, radius):
 
 
 def getSidewalkSegments(lat, lon, radius):
-    segments = naviterier_api.findSegments(lat, lon, radius, "Sidewalk")
+    segments = naviterier_api.findSegments(lat, lon, radius, "Walkable")
 
     return segments
 

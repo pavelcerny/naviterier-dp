@@ -36,6 +36,11 @@ def findSegments(lat, lon, radius, formOfWay ='All'):
     # filter by FormOfWay
     if formOfWay == 'All':
         return segments
+    elif formOfWay == "Walkable":
+        sidewalks = _filterByFormOfWay(segments, "Sidewalk")
+        walkways = _filterByFormOfWay(segments, "WalkWay")
+        filtered_segments = sidewalks + walkways
+        return filtered_segments
     else:
         return _filterByFormOfWay(segments, formOfWay)
 
