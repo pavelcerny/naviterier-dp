@@ -79,10 +79,22 @@ def getGpsFromAddressAPI(request):
     return HttpResponse(response_json)
 
 
-def getTracing(request):
+def getNavigationItineraryFromAddressToAddress(request):
     # unpack
-    sourceAddress = request.GET['TargetAddress']
-    tartgetAddress = request.GET['SourceAddress']
+    sourceAddress = request.GET['SourceAddress']
+    tartgetAddress = request.GET['TargetAddress']
+
+    # do
+    response = getItinerary(sourceAddress, tartgetAddress)
+
+    # pack
+    return HttpResponse(json.dumps(response), content_type="application/json")
+
+
+def getNavigationItineraryFromSegmentIdToAddress(request):
+    # unpack
+    sourceAddress = request.GET['SourceSegmentId']
+    tartgetAddress = request.GET['TargetAddress']
 
     # do
     response = getItinerary(sourceAddress, tartgetAddress)

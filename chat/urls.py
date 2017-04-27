@@ -16,7 +16,7 @@ urlpatterns = [
     url(r'^showcompass$', views.showCompass, name='showCompass'),
     url(r'^clicker$', views.mapClicker, name='clicker'),
     url(r'^navigateExample$', views.navigateExample, name='navigateExample'),
-    url(r'^navigate$', views.navigate, name='navigate'),
+    url(r'^navigate$', views.navigateCurrentNaviterier, name='navigate'),
 
 
     # API

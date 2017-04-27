@@ -10,7 +10,7 @@ def index_html(request):
     return render(request, 'chat/index.html', {})
 
 
-def navigate(request):
+def navigateCurrentNaviterier(request):
     return render(request, 'chat/naviterierCurrent.html', {})
 
 
