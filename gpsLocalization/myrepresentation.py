@@ -1,3 +1,6 @@
+from chat_demo.settings import RADIUS
+
+
 class UserPath:
     def __init__(self, beforeCorner, afterCorner):
         self.beforeCorner = beforeCorner
@@ -8,7 +11,7 @@ class UserPath:
         return self.beforeCorner[-1]
 
     def getRadius(self):
-        return 70
+        return RADIUS
 
     def getLastPosition(self):
         return self.afterCorner[-1]

@@ -12,4 +12,5 @@ urlpatterns = [
     url(r'^getsidewalks$', views.getSidewalksAPI, name='getSidewalks'),
     url(r'^getsidewalksgrouped$', views.getGroupedSidewalksAPI, name='getSidewalksGrouped'),
     url(r'^locateme$', views.locateMeAPI, name='locateMeAPI'),
+    url(r'^projectionToAddress$', views.getAddressForProjectionAPI, name='getAddressForProjectionApi'),
 ]

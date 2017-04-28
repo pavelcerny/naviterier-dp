@@ -21,6 +21,10 @@ def getPaths(lat, lon, radius):
     return paths
 
 
+def getData(lat,lon, radius):
+    return naviterier_api.findSourceData(lat,lon,radius)
+
+
 def _mergePaths(paths):
     """ merge each 2 paths with the same ending/starting point """
     n_groups = len(paths)

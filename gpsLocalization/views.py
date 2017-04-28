@@ -4,7 +4,7 @@ from django.http import HttpResponse
 from django.views.decorators.csrf import csrf_exempt
 
 from gpsLocalization import myrepresentation, data
-from gpsLocalization.functions import locateMe
+from gpsLocalization.functions import locateMe, getAddressFromProjection
 from gpsLocalization.myrepresentation import UserPath
 
 
@@ -95,3 +95,17 @@ def _getUserPathFromLocateMeData(data):
     my_afterCorner = myrepresentation.latlon2tuple_array(afterCorner)
     my_userPath = UserPath(my_beforeCorner, my_afterCorner)
     return my_userPath
+
+
+@csrf_exempt
+def getAddressForProjectionAPI(request):
+    # unpack
+    json_str = request.body
+    projection = json.loads(json_str)
+
+    # do
+    address = getAddressFromProjection(projection)
+
+    # pack
+    return_address = "{} {}".format(address["Street"],address["HouseNumber"])
+    return HttpResponse(return_address)

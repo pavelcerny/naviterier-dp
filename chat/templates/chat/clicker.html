@@ -476,7 +476,27 @@
                 drawEdges(edges);
                 ctx.restore();
 
+                getAddressForProjection(myPosition);
+
             }
+        }
+    </script>
+
+    <!-- find address-->
+    <script>
+        function getAddressForProjection(projection) {
+            //send GPS logLatLon
+            var url = "{% url "gpsLocalization:getAddressForProjectionApi" %}";
+            var post_data = projection
+
+            $.ajax({
+                type: "POST",
+                url: url,
+                data: JSON.stringify(post_data),
+                success: function (text) {
+                    alert(text);
+                },
+            });
         }
     </script>
 

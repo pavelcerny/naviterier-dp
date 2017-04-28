@@ -1,10 +1,12 @@
 import math
 
-from gpsLocalization import data
-from mathfunctions.functions import getAngleOfTwoSegments, dist2
+import mathfunctions
+from chat_demo.settings import TRESHOLD_ANGLE, RADIUS
+from gpsLocalization import data, myrepresentation
+from gpsLocalization.myrepresentation import latlon2tuple
 from mathfunctions import functions
+from mathfunctions.functions import getAngleOfTwoSegments, dist2
 
-TRESHOLD_ANGLE = 140
 
 def _getClosestEdge(point, edges):
     minDist = math.inf
@@ -186,3 +188,124 @@ def distance2PointEdge(p, segment):
     p_y = p[1]
 
     return dist2(a_x, a_y, b_x, b_y, p_x, p_y)
+
+
+def getEdgesInPath(path):
+    n = len(path)-1
+    edges = [0]*n
+    for i in range(n):
+        edges[i] = (_getEdge(i,path))
+
+    return edges
+
+def getDistancePointPath(projection, path):
+    edges = getEdgesInPath(path)
+    return _distancePointEdges(projection, edges)
+
+
+def _getPathForProjection(projection, paths):
+    minPath = paths[0]
+    minDistance = math.inf
+    for path in paths:
+        dist = getDistancePointPath(projection,path)
+        if dist < minDistance:
+            minDistance = dist
+            minPath = path
+
+    return minPath
+
+
+def getClusterIdForProjection(clusters, path, projection_tuple):
+    clusterId = clusters[0]
+    minDist = math.inf
+    for i in range(len(clusters)):
+        edge = (_getEdge(i, path))
+        dist = distance2PointEdge(projection_tuple, edge)
+
+        if dist < minDist:
+            minDist = dist
+            clusterId = clusters[i]
+    return clusterId
+
+
+def getIdsForEdges(edges,nav_data):
+
+    ids = []
+
+    for long_segment in nav_data:
+        simple_segments = getEdgesInPath(long_segment["Shape"]["Points"])
+        id = long_segment["Id"]
+        for segment in simple_segments:
+            # todo set
+            segment_a = segment[0]
+            segment_b = segment[1]
+            for edge in edges:
+                e_a = edge[0]
+                e_b = edge[1]
+                if e_a == segment_a and e_b == segment_b:
+                    ids.append(id)
+                elif e_b == segment_a and e_a == segment_b:
+                    ids.append(id)
+
+    return ids
+
+
+def getNearestEntryPoint(entrypoints, projection_tuple):
+    minEntrypoint = entrypoints[0]
+    minDist = math.inf
+    for e in entrypoints:
+        e_tuple = myrepresentation.latitudelongitude2tuple(e["Shape"])
+        dist = mathfunctions.functions.length_squared(e_tuple, projection_tuple)
+        if dist < minDist:
+            minDist = dist
+            minEntrypoint = e
+    return minEntrypoint
+
+
+def getEntryPointsForRoadIds(roadIds, nav_data):
+    entryPoints = nav_data["AddressEntryPoints"]
+    rememberedEntryPoints = []
+    for entryPoint in entryPoints:
+        for id in roadIds:
+            if id == entryPoint["RoadId"]:
+                rememberedEntryPoints.append(entryPoint)
+
+    return rememberedEntryPoints
+
+
+def getAddressForEntrypoint(nearest, nav_data):
+    id = nearest["Id"]
+    addresses = nav_data["Addresses"]
+    my_address = {}
+    for address in addresses:
+        if address["Id"]== id:
+            my_address = address
+            break
+    return my_address
+
+
+def getAddressFromProjection(projection):
+    lat = projection["lat"]
+    lon = projection["lon"]
+    nav_data_sidewalks = data.getSidewalkSegments(lat, lon, RADIUS+20)
+    nav_data = data.getData(lat,lon,RADIUS+20)
+
+    projection_tuple = latlon2tuple(projection)
+    paths = _getPathsForProjection(projection)
+    my_path = _getPathForProjection(projection_tuple,paths)
+    clusters = _clusterPath(my_path)
+    clusterLabel = getClusterIdForProjection(clusters, my_path, projection_tuple)
+    edges = getEdgesInCluster(clusterLabel,clusters,my_path)
+    roadIds = getIdsForEdges(edges,nav_data_sidewalks)
+    entrypoints = getEntryPointsForRoadIds(roadIds,nav_data)
+    nearest = getNearestEntryPoint(entrypoints,projection_tuple)
+    address = getAddressForEntrypoint(nearest,nav_data)
+    return address
+
+
+def _getPathsForProjection(projection):
+    lat = projection["lat"]
+    lon = projection["lon"]
+    radius = RADIUS
+    paths = data.getPaths(lat, lon, radius)
+    return paths
