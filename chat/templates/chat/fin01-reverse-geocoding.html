@@ -119,7 +119,7 @@
             shownAccuracy = Math.round(coords.Accuracy);
             if (coords != null) {
                 // when accuracy changes for at least 10m
-                if (Math.abs(prevShownAccuracy-shownAccuracy) >= 10){
+                if (Math.abs(prevShownAccuracy-shownAccuracy) >= 5){
                     displayMessageGeolocation("+-" + shownAccuracy + "m. ");
                 }
             }
