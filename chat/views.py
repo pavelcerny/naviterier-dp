@@ -51,9 +51,15 @@ def navigateExample(request):
         targetAddress = "Myslíkova 13"
         sourceAddress = "Lazarská 5"
 
+    if "PreviousUrl" in request.GET:
+        previousUrl = request.GET["PreviousUrl"]
+    else:
+        previousUrl = ""
+
     context = {
         "TargetAddress" : targetAddress,
         "SourceAddress" : sourceAddress,
+        "PreviousUrl" : previousUrl
     }
     return render(request, 'chat/protoFIN-navigate.html', context)
 

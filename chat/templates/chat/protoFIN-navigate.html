@@ -11,12 +11,14 @@
     <button id="buttonStartJourney" onclick="startJourney()">Jdu na to</button> <br>
     <button id="buttonNextPart" onclick="nextPart()">Další úsek</button> <br>
     <button id="buttonPreviousPart" onclick="previousPart()">Předchozí úsek</button> <br>
+    <button id="buttonBackToSetup" onclick="backToSetup()">zpět</button>
 
     <script src="{% static "js/jquery.js" %}"></script>
 
     <script>
         var targetAddress = "{{ TargetAddress }}";
         var sourceAddress = "{{ SourceAddress }}";
+        var previousUrl = "{{ PreviousUrl }}"
 
         var onTrack = false;
         var reachedTarget = false;
@@ -73,6 +75,10 @@
             onTrack = true;
             draw();
         }
+
+        function backToSetup() {
+            window.location.replace(previousUrl);
+        }
     </script>
 
     <!-- render logic -->
@@ -88,11 +94,17 @@
                 } else {
                     $("#buttonNextPart").show();
                 }
+                $("#buttonBackToSetup").hide();
             } else {
                 message = itinerary['GeneralDescription'];
                 $("#buttonStartJourney").show();
                 $("#buttonNextPart").hide();
                 $("#buttonPreviousPart").hide();
+                $("#buttonBackToSetup").show();
+            }
+
+            if (previousUrl == ""){
+                $("#buttonBackToSetup").hide();
             }
             displayMessage(message)
         }
