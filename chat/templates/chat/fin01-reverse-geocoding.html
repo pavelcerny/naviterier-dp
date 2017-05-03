@@ -33,6 +33,8 @@
         var coords = null;
         var int = 1;
         var enteringTarget = true;
+        var shownAccuracy = 999;
+        var prevShownAccuracy = 999;
     </script>
 
 
@@ -112,11 +114,14 @@
 
 
         function displayAccruacy() {
-            //todo when accuracy drops down for at least 10m
 
-            var shownAccuracy = Math.round(coords.Accuracy);
+            prevShownAccuracy = shownAccuracy;
+            shownAccuracy = Math.round(coords.Accuracy);
             if (coords != null) {
-                displayMessageGeolocation("aktuální přesnost +-" + shownAccuracy + "m. " + int++);
+                // when accuracy changes for at least 10m
+                if (Math.abs(prevShownAccuracy-shownAccuracy) >= 10){
+                    displayMessageGeolocation("+-" + shownAccuracy + "m. ");
+                }
             }
         }
     </script>
