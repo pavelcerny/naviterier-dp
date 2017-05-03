@@ -2,6 +2,19 @@ from django.http import HttpResponse
 from django.shortcuts import render
 
 
+def reverseGeocodingFinal(request):
+    return render(request, 'chat/fin01-reverse-geocoding.html')
+
+
+def poiFinal(request):
+    return render(request, 'chat/proto02-poi-chat.html')
+
+
+def gpsFinal(request):
+    return render(request, 'chat/proto03-gps.html')
+
+
+# old methods
 def index(request):
     return HttpResponse("Hello, world. You're at the polls index.")
 
