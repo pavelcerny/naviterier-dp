@@ -93,3 +93,5 @@ def processUserInput(request):
     return HttpResponse(text)
 
 
+def sandbox(request):
+    return render(request, 'chat/sandbox.html')

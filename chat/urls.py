@@ -24,6 +24,7 @@ urlpatterns = [
     url(r'^clicker$', views.mapClicker, name='clicker'),
     url(r'^navigateExample$', views.navigateExample, name='navigateExample'),
     url(r'^navigate$', views.navigateCurrentNaviterier, name='navigate'),
+    url(r'^sb$', views.sandbox, name='sandbox'),
 
 
     # APIs
