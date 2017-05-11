@@ -13,7 +13,7 @@
         <form id="targetForm" method="get" action="" onsubmit="event.preventDefault(); search1.goSecond()">
             <div id="ui1_alert" role="alert" class="feedback"></div>
             <label id="inputLabel" for="InputTargetAddress">Kam jdeš?</label>
-            <button id="voiceInputButton" onclick="voice1.processVoiceRecording()">Zadat hlasem</button>
+            <button type="button" id="voiceInputButton" onclick="voice1.processVoiceRecording()">Zadat hlasem</button>
             <input type="text" id="InputTargetAddress" name="TargetAddress" placeholder="např. Myslíkova 22"/>
 
             <input id="submitTargetAddress" type="submit" value="Dál">
@@ -45,17 +45,8 @@
             hideVoiceIfNotSupported("voiceInputButton");
             search1 = new Search("InputTargetAddress", "ui1_alert", "ui2_alert", "submitTargetAddress", "buttonBackToFirst",
                 "buttonStart", "accuracyText", "ui-1", "ui-2", "inputLabel", "accuracyLabel");
-            voice1 = new VoiceRecognition("voiceInputButton","InputTargetAddress", search1.goSecond());
+            voice1 = new VoiceRecognition("voiceInputButton","InputTargetAddress", search1.goSecond);
         });
-    </script>
-
-    <!-- HTML5 Speech Recognition API -->
-    <script>
-        function handleVoiceInput() {
-            // todo fill in and read aloud
-            startDictation(handleVoiceInput);
-        }
-
     </script>
 
     <!-- geolocalization -->
@@ -80,7 +71,7 @@
             }
 
             this.geo_error = function () {
-                alert("Pardon, napodařilo se načíst pozici.");
+                alert("Pardon, nepodařilo se načíst pozici.");
             }
 
             this.startGps = function () {
@@ -160,7 +151,8 @@
 
             this.goSecond = function () {
                 //validate
-                this.validate(function () {
+                console.log('launched go second');
+                self.validate(function () {
                     self.firstPart = false;
                     self.drawGui();
                     var val = self.$text.val();
@@ -205,7 +197,7 @@
                             } else {
                                 // wrong street
                                 self.handleInvalidAddress('Ulice ' + '\'' + inNaviterier.input.street + '\' není v naší databázi' +
-                                    ' adres, zkus zkontroluj jestli nemáš překlep, nebo zkus jinou ulici');
+                                    ' adres, zkontroluj jestli nemáš překlep, nebo zkus jinou ulici');
 
                                 return false;
                             }

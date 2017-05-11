@@ -6,18 +6,10 @@
                 var self = this;
                 this.$recordButton = $("#" + buttonRecorId);
                 this.$text = $("#" + inputId);
-                this.onSuccess = onSuccess;
-
-
-                (function () {
-                    //initialize the class
-                    this.hasSpeechRecognition = window.hasOwnProperty('webkitSpeechRecognition');
-                    this.drawVoiceInput();
-                })
 
 
                 this.handleRecognizedText = function (text) {
-                    self.$text.html(text);
+                    self.$text.val(text);
                 }
 
                 this.processVoiceRecording = function () {
@@ -38,9 +30,10 @@
                         recognition.onresult = function (e) {
                             var commandReceived = e.results[0][0].transcript;
                             recognition.stop();
+                            console.log('received '+commandReceived );
 
                             self.handleRecognizedText(commandReceived);
-                            self.onSuccess();
+                            self.sucessFunction();
                         };
 
                         recognition.onerror = function (e) {
@@ -60,6 +53,14 @@
                         self.hideVoiceInputButton();
                     }
                 }
+
+
+
+                //initialize the class
+                this.hasSpeechRecognition = window.hasOwnProperty('webkitSpeechRecognition');
+                this.drawVoiceInput();
+                this.sucessFunction = onSuccess;
+
         }
     </script>
 {% endblock %}
