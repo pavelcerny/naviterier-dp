@@ -19,7 +19,7 @@ function getGPS(address, callback) {
         callback);
 }
 
-function inNaviterierDB(address) {
+function inNaviterierDB(address, callback) {
     //check if address is Naviterier
     //todo
     return true;

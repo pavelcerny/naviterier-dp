@@ -37,6 +37,7 @@ ALLOWED_HOSTS = [
 INSTALLED_APPS = [
     'chat.apps.ChatConfig',
     'apis.apps.ApisConfig',
+    'naviterier.apps.NaviterierConfig',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',

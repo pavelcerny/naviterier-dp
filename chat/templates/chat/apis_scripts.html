@@ -1,0 +1,31 @@
+{% block apis %}
+    <script>
+        function getAddress(lat, lon, callback) {
+            // get address from coordinates
+            $.get(
+                "{% url 'apis:addressFromGps' %}",
+                {'lat': lat, 'lon': lon},
+                callback
+            );
+        }
+
+        function getGPS(address, callback) {
+            // get gps fromAddress
+            $.get(
+                "{% url 'apis:gpsFromAddress' %}",
+                {'address': address},
+                callback);
+        }
+
+        function inNaviterierDB(address, callback) {
+            //check if address is Naviterier
+            $.get(
+                "{% url 'naviterier:isAddressInDb' %}",
+                {'address': address},
+                callback
+            );
+
+            return false;
+        }
+    </script>
+{% endblock %}

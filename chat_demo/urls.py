@@ -22,4 +22,6 @@ urlpatterns = [
     url(r'^', include('chat.urls', namespace="chat")),
     url(r'^gpstools/', include('gpsLocalization.urls', namespace="gpsLocalization")),
     url(r'^apis/', include('apis.urls', namespace="apis")),
+    url(r'^naviterier/', include('naviterier.urls', namespace="naviterier")),
+
 ]
