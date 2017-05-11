@@ -13,7 +13,7 @@
         <form id="targetForm" method="get" action="" onsubmit="event.preventDefault(); search1.goSecond()">
             <div id="ui1_alert" role="alert" class="feedback"></div>
             <label id="inputLabel" for="InputTargetAddress">Kam jdeš?</label>
-            <button id="voiceInputButton" onclick="startDictation()">Zadat hlasem</button>
+            <button id="voiceInputButton" onclick="voice1.processVoiceRecording()">Zadat hlasem</button>
             <input type="text" id="InputTargetAddress" name="TargetAddress" placeholder="např. Myslíkova 22"/>
 
             <input id="submitTargetAddress" type="submit" value="Dál">
@@ -30,22 +30,12 @@
     </div>
 
 
-
-    <!-- variables -->
-    <script>
-        //var coords = null;
-
-        //var shownAccuracy = 999;
-        //var prevAccuracy = 999;
-    </script>
-
-
     <!-- scripts -->
     {% load static %}
     <script src="{% static "chat/voiceInput.js" %}"></script>
     <script src="{% static "js/jquery.js" %}"></script>
     {% include 'chat/apis_scripts.html' %}
-    {#    <script src="{% static "chat/apis.js" %}"></script>#}
+    {% include 'chat/voicerecogintion_scripts.html' %}
 
 
     <!-- on load-->
@@ -55,6 +45,7 @@
             hideVoiceIfNotSupported("voiceInputButton");
             search1 = new Search("InputTargetAddress", "ui1_alert", "ui2_alert", "submitTargetAddress", "buttonBackToFirst",
                 "buttonStart", "accuracyText", "ui-1", "ui-2", "inputLabel", "accuracyLabel");
+            voice1 = new VoiceRecognition("voiceInputButton","InputTargetAddress", search1.goSecond());
         });
     </script>
 

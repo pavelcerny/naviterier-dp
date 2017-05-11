@@ -1,0 +1,65 @@
+{% block voice_recognition %}
+    <script>
+        // HTML5 Speech Recognition API
+
+            function VoiceRecognition(buttonRecorId,inputId, onSuccess) {
+                var self = this;
+                this.$recordButton = $("#" + buttonRecorId);
+                this.$text = $("#" + inputId);
+                this.onSuccess = onSuccess;
+
+
+                (function () {
+                    //initialize the class
+                    this.hasSpeechRecognition = window.hasOwnProperty('webkitSpeechRecognition');
+                    this.drawVoiceInput();
+                })
+
+
+                this.handleRecognizedText = function (text) {
+                    self.$text.html(text);
+                }
+
+                this.processVoiceRecording = function () {
+                    if (window.hasOwnProperty('webkitSpeechRecognition')) {
+
+                        var recognition = new webkitSpeechRecognition();
+
+                        recognition.continuous = false;
+                        recognition.interimResults = false;
+
+                        recognition.lang = "cs-CZ";
+                        recognition.start();
+                        console.log('Ready to receive command');
+
+                        var diagnostic = document.querySelector('.output');
+                        var cmd = document.querySelector('html');
+
+                        recognition.onresult = function (e) {
+                            var commandReceived = e.results[0][0].transcript;
+                            recognition.stop();
+
+                            self.handleRecognizedText(commandReceived);
+                            self.onSuccess();
+                        };
+
+                        recognition.onerror = function (e) {
+                            recognition.stop();
+                        }
+
+                    }
+                }
+
+                this.hideVoiceInputButton = function () {
+                    self.$recordButton.hide();
+                }
+
+                this.drawVoiceInput = function () {
+                    // hide voice input if not supported
+                    if (!self.hasSpeechRecognition) {
+                        self.hideVoiceInputButton();
+                    }
+                }
+        }
+    </script>
+{% endblock %}

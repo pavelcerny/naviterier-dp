@@ -43,7 +43,10 @@ def isAddressInDbAPI(request):
         if i!=0:
             street += " "
         street += w
-    number = words[-1]
+    if len(words) < 2:
+        number = 'nevyplnil jsi číslo'
+    else:
+        number = words[-1]
     response = json.dumps(isAddressInDB(street,number))
     return HttpResponse(response)
 
