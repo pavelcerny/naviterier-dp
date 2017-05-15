@@ -16,6 +16,7 @@ Including another URLconf
 from django.conf.urls import url, include
 
 # from django.contrib import admin
+from django.contrib import admin
 
 urlpatterns = [
     # url(r'^admin/', admin.site.urls),
@@ -23,5 +24,7 @@ urlpatterns = [
     url(r'^gpstools/', include('gpsLocalization.urls', namespace="gpsLocalization")),
     url(r'^apis/', include('apis.urls', namespace="apis")),
     url(r'^naviterier/', include('naviterier.urls', namespace="naviterier")),
+    url(r'^dpp/', include('dpp.urls', namespace="dpp")),
+    url(r'^admin/', admin.site.urls),
 
 ]

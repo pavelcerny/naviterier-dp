@@ -38,6 +38,8 @@ INSTALLED_APPS = [
     'chat.apps.ChatConfig',
     'apis.apps.ApisConfig',
     'naviterier.apps.NaviterierConfig',
+    'dpp.apps.DppConfig',
+    'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
@@ -45,6 +47,8 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'jquery',
     'ChatDemo',
+    'adaptor',
+    'csvimport.app.CSVImportConf',
 ]
 
 MIDDLEWARE = [
