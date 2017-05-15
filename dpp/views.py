@@ -27,11 +27,16 @@ def find(request):
     startStopDirection = "Václavské náměstí"
     startLineNumber = "9"
 
-    # time = datetime.strptime('7:00:00', '%H:%M:%S')
+    if ('startStopName' in request.POST):
+        startStopName = request.post['startStopName']
+    if ('startStopDirection' in request.POST):
+        startStopDirection = request.post['startStopDirection']
+    if ('startLineNumber' in request.POST):
+        startLineNumber = request.post['startLineNumber']
 
     response = findFromTriple(startStopName,startStopDirection,startLineNumber)
 
-    return HttpResponse(json.dumps(response))
+    return HttpResponse(json.dumps(response), {'content-type':'application/json'})
 
 
 
