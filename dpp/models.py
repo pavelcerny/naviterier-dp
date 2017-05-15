@@ -31,7 +31,7 @@ class Calendar_date(models.Model):
 
 class Route(models.Model):
     route_id = models.CharField(max_length=12, primary_key=True)
-    agency_id = models.ForeignKey(Agency, on_delete=None)
+    agency = models.ForeignKey(Agency, on_delete=None)
     route_short_name = models.CharField(max_length=12)
     route_long_name = models.CharField(max_length=50)
     route_type = models.IntegerField()
@@ -46,11 +46,11 @@ class Shape(models.Model):
 
 
 class Trip(models.Model):
-    route_id = models.ForeignKey(Route, on_delete=models.CASCADE)
-    service_id = models.ForeignKey(Calendar, on_delete=models.CASCADE)
+    route = models.ForeignKey(Route, on_delete=models.CASCADE)
+    service = models.ForeignKey(Calendar, on_delete=models.CASCADE)
     trip_id = models.IntegerField(primary_key=True)
     trip_headsign = models.CharField(max_length=30)
-    shape_id = models.ForeignKey(Shape, on_delete=None)
+    shape = models.ForeignKey(Shape, on_delete=None)
     wheelchair_accessible = models.IntegerField()
 
 
@@ -65,10 +65,10 @@ class Stop(models.Model):
 
 
 class Stop_time(models.Model):
-    trip_id = models.ForeignKey(Trip, on_delete=models.CASCADE)
+    trip = models.ForeignKey(Trip, on_delete=models.CASCADE)
     arrival_time = models.TimeField()
     departure_time = models.TimeField()
-    stop_id = models.ForeignKey(Stop, on_delete=models.CASCADE)
+    stop = models.ForeignKey(Stop, on_delete=models.CASCADE)
     stop_sequence = models.PositiveIntegerField()
     pickup_type = models.PositiveSmallIntegerField()
     drop_off_type = models.PositiveSmallIntegerField()
