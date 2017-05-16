@@ -7,7 +7,7 @@ def reverseGeocodingFinal(request):
 
 
 def poiFinal(request):
-    return render(request, 'chat/proto02-poi-chat.html')
+    return render(request, 'chat/fin02-poi-chat.html')
 
 
 def gpsFinal(request):

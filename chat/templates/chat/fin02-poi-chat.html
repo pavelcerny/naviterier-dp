@@ -1,0 +1,360 @@
+{% extends 'chat/basetemplate.html' %}
+
+{% block title %}
+    POI
+{% endblock %}
+
+
+{% block body %}
+
+
+    <!-- UI -->
+    <div id="ui-1">
+        <div id="question" aria-live="polite">Načítám dialog...</div>
+
+        <!-- Search Form -->
+        <form id="userReplyForm" method="get" action="" onsubmit="event.preventDefault(); watson1.goNext()">
+            <div class="speech">
+                <div id="alert" role="alert" class="feedback"></div>
+                <input type="button" onclick="voice1.processVoiceRecording()" value="Odpověz hlasem"/>
+                <input type="text" id="inputAnswer" name="userReply" placeholder="Odpověz psaním" aria-haspopup="true"/>
+                <input type="submit" id="sendButton" value="Odešli textové pole">
+            </div>
+        </form>
+    </div>
+
+
+
+    <!-- scripts -->
+    {% load static %}
+    <script src="{% static "chat/voiceInput.js" %}"></script>
+    <script src="{% static "js/jquery.js" %}"></script>
+    {% include 'chat/apis_scripts.html' %}
+    {% include 'chat/voicerecogintion_scripts.html' %}
+
+
+    <!-- on load-->
+    <script>
+        var search1 = null;
+        var watson1 = null;
+        jQuery(document).ready(function () {
+            hideVoiceIfNotSupported("voiceInputButton");
+            watson1 = new Watson("question", "inputAnswer", "sendButton", "alert");
+            voice1 = new VoiceRecognition("voiceInputButton", "InputTargetAddress", watson1.goNext);
+        });
+    </script>
+
+
+    <script>
+        function redirectToNavigation(sourceAddress, targetAddress, currentUrl) {
+            var sourceEncoded = encodeURIComponent(sourceAddress).replace(/%20/g, '+');
+            var targetEncoded = encodeURIComponent(targetAddress).replace(/%20/g, '+');
+            var finalUrl = "{% url 'chat:navigateExample'%}?SourceAddress=" + sourceEncoded + "&TargetAddress=" + targetEncoded;
+            if (currentUrl !== undefined) {
+                var currentUrl = "{{ request.path }}"
+                finalUrl += "&PreviousUrl=" + currentUrl
+            }
+            window.location.replace(finalUrl);
+        }
+    </script>
+
+    <script>
+        function Watson(question_id, answer_id, send_id, alert_id) {
+            var self = this;
+
+            this.$question = $('#' + question_id);
+            this.$answer = $('#' + answer_id);
+            this.$send = $('#' + send_id);
+            this.$alert = $('#' + alert_id);
+
+            this.context = '';
+            this.question = '';
+            this.done = false;
+            this.methodMhd = false;
+
+            this.navigationDetails = null;
+
+            this.goNext = function () {
+                //validate
+                console.log('launched go next');
+                self.validate(function () {
+                    self.textWatson(self.drawGui);
+                });
+            }
+
+            this.validate = function (success) {
+                var val = self.$answer.val();
+                //check if empty
+                if (val == '') {
+                    this.handleInputError('Zapomněl jsi zadat odpověď.');
+
+                    return false;
+                }
+
+                self.$answer.attr('aria-invalid', 'false');
+                self.$alert.html('');
+                self.$alert.hide();
+
+                success();
+                return true;
+            }
+
+            this.handleInputError = function (message) {
+                self.$answer.attr('aria-invalid', 'true');
+                self.$alert.html(message);
+                self.$alert.show();
+            }
+
+            this.isDialogDone = function (output) {
+                if (output.done === 'undefined') {
+                    return false;
+                } else {
+                    return output.done;
+                }
+            }
+
+            this.setNavigationDetails = function () {
+                var navigationDetails = {
+                    "TargetLandregistryNumber": self.context.TargetLandregistryNumber,
+                    "TargetStreet": self.context.TargetStreet,
+                }
+
+                if (self.methodMhd) {
+                    navigationDetails["StartLineDirection"] = self.context.StartLineDirection;
+                    navigationDetails["StartLineNumber"] = self.context.StartLineNumber;
+                    navigationDetails["StartStopName"] = self.context.StartStopName;
+                } else {
+                    navigationDetails["StartStreet"] = self.context.StartStreet;
+                    navigationDetails["StartLandregistryNumber"] = self.context.StartLandregistryNumber;
+                }
+                self.navigationDetails = navigationDetails;
+            }
+
+
+            this.isMethodMhd = function (output) {
+                if (output.methodMhd === 'undefined') {
+                    return false;
+                } else {
+                    return output.methodMhd;
+                }
+            }
+
+            this.textWatson = function (callback) {
+                var url = "{% url 'chat:watson_response' %}";
+                var post_data = {
+                    csrfmiddlewaretoken: "{{ csrf_token }}",
+                    context: self.context,
+                    text: self.$answer.val(),
+                };
+                $.ajax({
+                    type: "POST",
+                    url: url,
+                    data: post_data,
+                    success: function (data) {
+                        //alert(data);
+                        var response = JSON.parse(data);
+                        self.context = response.context;
+                        self.question = response.output.text;
+                        self.done = self.isDialogDone(response.output);
+                        self.methodMhd = self.isMethodMhd(response.output);
+                        callback();
+                    }
+                })
+            }
+
+            this.drawGui = function () {
+                self.displayMessage(self.question);
+                self.$answer.val('');
+                if (self.done) {
+                    self.setNavigationDetails();
+                    self.startNavigation();
+                }
+            }
+
+            this.displayMessage = function (message) {
+                self.$question.html(message);
+            }
+
+            this.getSourceAddress = function (callback) {
+                if (self.methodMhd) {
+                    var direction = navigationDetails["StartLineDirection"];
+                    var line = navigationDetails["StartLineNumber"];
+                    var stop = navigationDetails["StartStopName"];
+
+
+                    getAddressFromTriple(stop, direction, line, callback)
+                } else {
+                    var sourceAddress = self.navigationDetails["StartStreet"] + " " + self.navigationDetails["StartLandregistryNumber"];
+                    callback(sourceAddress)
+                }
+            }
+
+            this.startNavigation = function () {
+                alert(JSON.stringify(self.navigationDetails));
+                var targetAddress = self.navigationDetails["TargetStreet"] + " " + self.navigationDetails["TargetLandregistryNumber"];
+                self.getSourceAddress(function (sourceAddress) {
+                    if (!inNaviterierDB(sourceAddress)) {
+                        self.$alert.html('Nejsi v oblasti pokryté naviterierem. Přesuň se víc do centra Prahy');
+                    } else if (!inNaviterierDB(targetAddress)) {
+                        self.$alert.html('Tvůj cíl neleží v oblasti pokryté naviterierem. vyber jiný víc v centru Prahy');
+                    } else {
+                        redirectToNavigation(sourceAddress, targetAddress, "{{ request.url }}");
+                    }
+                });
+            }
+
+            this.textWatson(this.drawGui);
+
+
+        }
+    </script>
+
+    <script>
+        function Search(text_id, alert1_id, alert2_id, goSecond_id, goFirst_id, goStart_id, gpsStatus_id, firstPart_id,
+                        secondPart_id, focuspoint1, focuspoint2) {
+
+            var self = this;
+
+            // define class properties
+            this.$text = $('#' + text_id);   // the jQuery object pointer to the text box
+            this.$gosecond = $('#' + goSecond_id); // the jQuery object pointer to the check guess button
+            this.$gofirst = $('#' + goFirst_id); // the jQuery object pointer to the check guess button
+            this.$alert1 = $('#' + alert1_id); // the jQuery object pointer to the alert area
+            this.$alert2 = $('#' + alert2_id); // the jQuery object pointer to the alert area
+            this.$firstPart = $('#' + firstPart_id); // the jQuery object pointer to the alert area
+            this.$secondPart = $('#' + secondPart_id); // the jQuery object pointer to the alert area
+            this.$start = $('#' + goStart_id); // the jQuery object pointer to the alert area
+            this.$gpsStatus = $('#' + gpsStatus_id); // the jQuery object pointer to the alert area
+            this.$focuspoint1 = $('#' + focuspoint2); // the jQuery object pointer to the alert area
+            this.$focuspoint2 = $('#' + focuspoint1); // the jQuery object pointer to the alert area
+
+            this.firstPart = true;
+
+            this.prevAccuracy = 999;
+            this.shownAccuracy = 999;
+            this.coords = null;
+
+            this.newSearch = function () {
+                // set i am in the first part
+                this.firstPart = true;
+                this.drawGui();
+
+            }
+
+            this.drawGui = function () {
+                if (this.firstPart) {
+                    this.$firstPart.show();
+                    this.$secondPart.hide();
+                    this.$focuspoint1.focus();
+                } else {
+                    this.$firstPart.hide();
+                    this.$secondPart.show();
+                    this.$focuspoint2.focus();
+                }
+            }
+
+            this.goSecond = function () {
+                //validate
+                console.log('launched go second');
+                self.validate(function () {
+                    self.firstPart = false;
+                    self.drawGui();
+                    var val = self.$text.val();
+                    self.$start.html("Spustit navigaci na " + val);
+                });
+            }
+
+            this.goFirst = function () {
+                this.firstPart = true;
+                this.drawGui();
+            }
+
+            this.handleInputError = function (message) {
+                this.$text.attr('aria-invalid', 'true');
+                this.$alert1.html(message);
+                this.$alert1.show();
+            }
+
+            this.validate = function (success) {
+                var val = this.$text.val();
+                //check if empty
+                if (val == '') {
+                    this.handleInvalidAddress('Zapomněl jsi vyplnit kam to bude.');
+
+                    return false;
+                } else
+                //check if in db
+                    inNaviterierDB(val, function (inNaviterier) {
+                        inNaviterier = JSON.parse(inNaviterier);
+                        if (inNaviterier.streetAndHouseNumber) {
+                            //cool
+                        } else if (inNaviterier.streetAndLandRegistryNumber) {
+                            //cool
+                        } else {
+                            // wrong number
+                            if (inNaviterier.street) {
+                                // just wrong number
+                                self.handleInvalidAddress('Číslo ' + '\'' + inNaviterier.input.number + '\' není v naší databázi' +
+                                    ' adres, zkus zadat adresu s jiným číslem');
+
+                                return false;
+                            } else {
+                                // wrong street
+                                self.handleInvalidAddress('Ulice ' + '\'' + inNaviterier.input.street + '\' není v naší databázi' +
+                                    ' adres, zkontroluj jestli nemáš překlep, nebo zkus jinou ulici');
+
+                                return false;
+                            }
+                        }
+
+                        self.$text.attr('aria-invalid', 'false');
+                        self.$alert1.html('');
+                        self.$alert1.hide();
+
+                        success();
+                        return true;
+                    });
+            }
+
+            this.startNavigation = function () {
+                var targetAddress = this.$text.val();
+                if (this.validateGps()) {
+                    getAddress(coords.Latitude, coords.Longitude, function (sourceAddress) {
+                        if (inNaviterierDB(sourceAddress)) {
+                            redirectToNavigation(sourceAddress, targetAddress, "{{ request.url }}");
+                        } else {
+                            this.$alert2.html('Nejsi v oblasti pokryté naviterierem. Přesuň se víc do centra Prahy.')
+                        }
+                    }.bind(this));
+                }
+            }
+
+            this.validateGps = function () {
+                if (this.coords == null) {
+                    this.$alert1.html('gps nevrací žádnou pozici');
+                    return false;
+                }
+                return true;
+            }
+
+            this.showGpsStatus = function (newValue) {
+                this.prevAccuracy = this.shownAccuracy;
+                this.shownAccuracy = Math.round(newValue);
+                // when accuracy changes for at least 10m
+                if (Math.abs(this.prevAccuracy - this.shownAccuracy) >= 5) {
+                    this.$gpsStatus.html("+-" + this.shownAccuracy + "m. ");
+                }
+            }
+
+            this.updateGpsGeolocation = function (coords) {
+                this.coords = coords;
+                this.showGpsStatus(this.coords.Accuracy);
+            }
+
+            // initialize the new search
+            this.newSearch();
+            this.gps = new Gps(gpsStatus_id, this.updateGpsGeolocation.bind(this))
+        }
+
+    </script>
+{% endblock %}

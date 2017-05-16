@@ -27,5 +27,25 @@
 
             return false;
         }
+
+        function getAddressFromTriple(stop, direction, line, callback) {
+            getGpsFromTriple(stop, direction, line, function (data) {
+                object = JSON.parse(data);
+                getAddress(object.lat,object.lon, callback);
+            })
+        }
+
+        function getGpsFromTriple(stop, direction, line, callback) {
+            $.post(
+                "{% url 'dpp:find' %}",
+                {
+                    csrfmiddlewaretoken: "{{ csrf_token }}",
+                    startStopName: stop,
+                    startStopDirection: direction,
+                    startLineNumber: line
+                },
+                callback(data)
+            )
+        }
     </script>
 {% endblock %}

@@ -13,8 +13,9 @@ def loadCSVToModel(filename, first_column_name, loadFunction):
         reader = csv.reader(f, delimiter=',', quotechar='"')
         i = 0
         for row in reader:
-            if (i/1000) > 1000:
-                print(i)
+            if (i % 1000) < 1:
+                print("{} #{} ok".format(filename, i))
+            i += 1
             if row[0] != first_column_name:
                 # Ignore the header row, import everything else
                 loadFunction(row)
@@ -32,7 +33,7 @@ def loadTrip(row):
     t.service_id = row[1]
     t.trip_id = row[2]
     t.trip_headsign = row[3]
-    t.shape_id = row[4]
+    # t.shape_id = row[4]
     t.wheelchair_accessible = row[5]
     t.save()
 

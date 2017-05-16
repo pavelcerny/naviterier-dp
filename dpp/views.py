@@ -14,7 +14,7 @@ def update(request):
     loadCSVToModel("calendar.txt", "service_id", loadCalendar)
     loadCSVToModel("calendar_dates.txt", "service_id", loadCalendar_date)
     loadCSVToModel("routes.txt", "route_id", loadRoute)
-    loadCSVToModel("shapes.txt", "shape_id", loadShape)
+    # loadCSVToModel("shapes.txt", "shape_id", loadShape)
     loadCSVToModel("trips.txt", "route_id", loadTrip)
     loadCSVToModel("stops.txt", "stop_id", loadStop)
     loadCSVToModel("stop_times.txt", "trip_id", loadStop_time)
@@ -23,9 +23,9 @@ def update(request):
 
 
 def find(request):
-    startStopName = "Lazarská"
-    startStopDirection = "Václavské náměstí"
-    startLineNumber = "9"
+    startStopName = "Slavia"
+    startStopDirection = "Strašnická"
+    startLineNumber = "7"
 
     if ('startStopName' in request.POST):
         startStopName = request.post['startStopName']
@@ -48,7 +48,11 @@ def findFromTriple(startStopName,startStopDirection,startLineNumber):
 
     for hs in headsigns:
         hs_val = hs['trip_headsign']
-        tripInHsDirection = Trip.objects.filter(route=route, trip_headsign=hs_val).last()
+
+        query_headsigns = Trip.objects.filter(route=route, trip_headsign=hs_val)
+
+        n_trips = query_headsigns.count()
+        tripInHsDirection = query_headsigns[int(n_trips/2)]
         query = Stop_time.objects.filter(trip=tripInHsDirection)
 
         query_stop = query.filter(stop__stop_name__contains=startStopName)
