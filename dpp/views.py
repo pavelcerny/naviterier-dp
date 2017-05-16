@@ -28,11 +28,11 @@ def find(request):
     startLineNumber = "7"
 
     if ('startStopName' in request.POST):
-        startStopName = request.post['startStopName']
+        startStopName = request.POST['startStopName']
     if ('startStopDirection' in request.POST):
-        startStopDirection = request.post['startStopDirection']
+        startStopDirection = request.POST['startStopDirection']
     if ('startLineNumber' in request.POST):
-        startLineNumber = request.post['startLineNumber']
+        startLineNumber = request.POST['startLineNumber']
 
     response = findFromTriple(startStopName,startStopDirection,startLineNumber)
 

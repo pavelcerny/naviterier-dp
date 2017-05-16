@@ -74,6 +74,16 @@
 
             this.navigationDetails = null;
 
+            this.alert = function (alert_text) {
+                self.$alert.html(alert_text);
+                self.$alert.show();
+            }
+
+            this.noAlert = function () {
+                self.$alert.html('');
+                self.$alert.hide();
+            }
+
             this.goNext = function () {
                 //validate
                 console.log('launched go next');
@@ -177,9 +187,9 @@
 
             this.getSourceAddress = function (callback) {
                 if (self.methodMhd) {
-                    var direction = navigationDetails["StartLineDirection"];
-                    var line = navigationDetails["StartLineNumber"];
-                    var stop = navigationDetails["StartStopName"];
+                    var direction = self.navigationDetails["StartLineDirection"];
+                    var line = self.navigationDetails["StartLineNumber"];
+                    var stop = self.navigationDetails["StartStopName"];
 
 
                     getAddressFromTriple(stop, direction, line, callback)
@@ -189,17 +199,55 @@
                 }
             }
 
+            this.validateInNaviterier = function (inNaviterier, successFunction) {
+                if (inNaviterier.streetAndHouseNumber) {
+                    //cool
+                } else if (inNaviterier.streetAndLandRegistryNumber) {
+                    //cool
+                } else {
+                    // wrong number
+                    if (inNaviterier.street) {
+                        // just wrong number
+                        self.alert('Číslo ' + '\'' + inNaviterier.input.number + '\' není v naší databázi' +
+                            ' adres, zkus zadat adresu s jiným číslem');
+
+                        return false;
+                    } else {
+                        // wrong street
+                        self.alert('Ulice ' + '\'' + inNaviterier.input.street + '\' není v naší databázi' +
+                            ' adres, zkontroluj jestli nemáš překlep, nebo zkus jinou ulici');
+
+                        return false;
+                    }
+                }
+
+                self.noAlert();
+
+                successFunction();
+                return true;
+            }
+
             this.startNavigation = function () {
                 alert(JSON.stringify(self.navigationDetails));
                 var targetAddress = self.navigationDetails["TargetStreet"] + " " + self.navigationDetails["TargetLandregistryNumber"];
                 self.getSourceAddress(function (sourceAddress) {
-                    if (!inNaviterierDB(sourceAddress)) {
-                        self.$alert.html('Nejsi v oblasti pokryté naviterierem. Přesuň se víc do centra Prahy');
-                    } else if (!inNaviterierDB(targetAddress)) {
-                        self.$alert.html('Tvůj cíl neleží v oblasti pokryté naviterierem. vyber jiný víc v centru Prahy');
-                    } else {
-                        redirectToNavigation(sourceAddress, targetAddress, "{{ request.url }}");
-                    }
+
+                    inNaviterierDB(sourceAddress, function (response) {
+                        // if source address is in DB
+                        var inNaviterier = JSON.parse(response)
+                        self.validateInNaviterier(inNaviterier, function () {
+
+                            inNaviterierDB(targetAddress, function (response) {
+                                //if target address is in DB
+                                var inNaviterier = JSON.parse(response);
+                                self.validateInNaviterier(inNaviterier, function () {
+
+                                    //everything ok
+                                    redirectToNavigation(sourceAddress, targetAddress, "{{ request.url }}");
+                                })
+                            })
+                        })
+                    })
                 });
             }
 

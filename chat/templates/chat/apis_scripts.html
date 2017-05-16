@@ -2,6 +2,7 @@
     <script>
         function getAddress(lat, lon, callback) {
             // get address from coordinates
+            // callback function foo(address) {} where address will be i.e. "Flemingovo náměstí 2710/1"
             $.get(
                 "{% url 'apis:addressFromGps' %}",
                 {'lat': lat, 'lon': lon},
@@ -19,6 +20,13 @@
 
         function inNaviterierDB(address, callback) {
             //check if address is Naviterier
+
+            //returns "{
+            // "street": true,                                  #if street exists in DB
+            // "streetAndHouseNumber": true,                    #if street with this house number in DB
+            // "streetAndLandRegistryNumber": false,            #if street with this landregistry number in DB
+            // "input": {"street": "Lazarsk\u00e1", "number": "3"}  # requested data
+            // }"
             $.get(
                 "{% url 'naviterier:isAddressInDb' %}",
                 {'address': address},
@@ -30,8 +38,8 @@
 
         function getAddressFromTriple(stop, direction, line, callback) {
             getGpsFromTriple(stop, direction, line, function (data) {
-                object = JSON.parse(data);
-                getAddress(object.lat,object.lon, callback);
+                //var object = JSON.parse(data);
+                getAddress(data.lat,data.lon, callback);
             })
         }
 
@@ -44,7 +52,7 @@
                     startStopDirection: direction,
                     startLineNumber: line
                 },
-                callback(data)
+                callback
             )
         }
     </script>
