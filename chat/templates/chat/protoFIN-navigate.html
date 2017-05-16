@@ -8,10 +8,11 @@
 
 {% block body %}
     <div id="question" aria-live="polite">Načítám dialog...</div>
-    <button id="buttonStartJourney" onclick="startJourney()">Jdu na to</button> <br>
-    <button id="buttonNextPart" onclick="nextPart()">Další úsek</button> <br>
-    <button id="buttonPreviousPart" onclick="previousPart()">Předchozí úsek</button> <br>
-    <button id="buttonBackToSetup" onclick="backToSetup()">zpět</button>
+    <div id="divButtonStartJourney"><button id="buttonStartJourney" onclick="startJourney()">Jdu na to</button></div>
+    <div id="divButtonNextPart"><button id="buttonNextPart" onclick="nextPart()">Další úsek</button></div>
+    <div id="divButtonPreviousPart"><button id="buttonPreviousPart" onclick="previousPart()">Předchozí úsek</button></div>
+    <div id="divButtonBackToSetup"><button id="buttonBackToSetup" onclick="backToSetup()">zpět</button></div>
+
 
     <script src="{% static "js/jquery.js" %}"></script>
 
@@ -87,24 +88,24 @@
             var message;
             if (onTrack) {
                 message = itinerary['Stages'][currentPart];
-                $("#buttonStartJourney").hide();
-                $("#buttonPreviousPart").show();
+                $("#divButtonStartJourney").hide();
+                $("#divButtonPreviousPart").show();
                 if (reachedTarget){
-                    $("#buttonNextPart").hide();
+                    $("#divButtonNextPart").hide();
                 } else {
-                    $("#buttonNextPart").show();
+                    $("#divButtonNextPart").show();
                 }
-                $("#buttonBackToSetup").hide();
+                $("#divButtonBackToSetup").hide();
             } else {
                 message = itinerary['GeneralDescription'];
-                $("#buttonStartJourney").show();
-                $("#buttonNextPart").hide();
-                $("#buttonPreviousPart").hide();
-                $("#buttonBackToSetup").show();
+                $("#divButtonStartJourney").show();
+                $("#divButtonNextPart").hide();
+                $("#divButtonPreviousPart").hide();
+                $("#divButtonBackToSetup").show();
             }
 
             if (previousUrl == ""){
-                $("#buttonBackToSetup").hide();
+                $("#divButtonBackToSetup").hide();
             }
             displayMessage(message)
         }
