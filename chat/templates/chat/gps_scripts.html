@@ -1,0 +1,43 @@
+{% block apis %}
+    <!-- geolocalization -->
+    <script>
+        function Gps(status_id, callback) {
+            this.$status = $("#" + status_id);
+            this.callback = callback;
+            this.geo_options = {
+                enableHighAccuracy: true,
+                maximumAge: 30000,
+                timeout: 27000
+            };
+
+
+            this.geo_success = function (position) {
+                coords = {
+                    Latitude: position.coords.latitude,
+                    Longitude: position.coords.longitude,
+                    Accuracy: position.coords.accuracy,
+                };
+                this.callback(coords);
+            }
+
+            this.geo_error = function () {
+                alert("Pardon, nepodařilo se načíst pozici.");
+            }
+
+            this.startGps = function () {
+                if ("geolocation" in navigator) {
+                    /* geolocation is available */
+                    this.$status.html("Spouštím GPS a určuji tvou přesnou pozici");
+                    var watchID = navigator.geolocation.watchPosition(this.geo_success.bind(this), this.geo_error.bind(this), this.geo_options);
+                } else {
+                    /* geolocation IS NOT available */
+                    this.$status.html("Geolokace v prohlížeči nefunguje. Zkus ji zapnout a znovu načíst stránku!")
+                }
+            }
+
+            this.startGps();
+        }
+
+
+    </script>
+{% endblock %}
