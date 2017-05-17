@@ -46,7 +46,7 @@ INSTALLED_APPS = [
     'jquery',
     'ChatDemo',
     'adaptor',
-    'csvimport.app.CSVImportConf',
+    # 'csvimport.app.CSVImportConf',
 ]
 
 MIDDLEWARE = [
