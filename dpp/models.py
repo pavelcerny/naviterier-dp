@@ -49,7 +49,7 @@ class Trip(models.Model):
     route = models.ForeignKey(Route, on_delete=models.CASCADE)
     service = models.ForeignKey(Calendar, on_delete=models.CASCADE)
     trip_id = models.IntegerField(primary_key=True)
-    trip_headsign = models.CharField(max_length=30)
+    trip_headsign = models.CharField(max_length=100)
     # shape = models.ForeignKey(Shape, on_delete=None)
     wheelchair_accessible = models.IntegerField()
 
