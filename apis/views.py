@@ -76,7 +76,7 @@ def getGpsFromAddressAPI(request):
 
     # pack
     response_json = json.dumps(location)
-    return HttpResponse(response_json)
+    return HttpResponse(response_json, content_type="application/json")
 
 
 def getNavigationItineraryFromAddressToAddress(request):
@@ -124,7 +124,7 @@ def watsonResponse(request):
 
     text = json.dumps(response)
     request.session['context'] = response['context']
-    return HttpResponse(text)
+    return HttpResponse(text, content_type="application/json")
 
 
 @csrf_exempt

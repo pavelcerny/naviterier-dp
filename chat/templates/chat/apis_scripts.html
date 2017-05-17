@@ -39,7 +39,7 @@
         function getAddressFromTriple(stop, direction, line, callback) {
             getGpsFromTriple(stop, direction, line, function (data) {
                 //var object = JSON.parse(data);
-                getAddress(data.lat,data.lon, callback);
+                getAddress(data.lat, data.lon, callback);
             })
         }
 
@@ -54,6 +54,42 @@
                 },
                 callback
             )
+        }
+
+        function gpsFromUserPath(userPath, callback) {
+            var post_data = {
+                csrfmiddlewaretoken: "{{ csrf_token }}",
+                userPath: userPath,
+                contentType: "application/json; charset=utf-8",
+            }
+
+            $.ajax({
+                type: "POST",
+                url: "{% url "gpsLocalization:locateMeAPI" %}",
+                data: JSON.stringify(post_data),
+                success: function (response) {
+                    callback(response);
+                },
+            });
+        }
+
+        function getAddressOnSidewalk(lat,lon, callback) {
+
+        // get address from coordinates
+            var url = "{% url "gpsLocalization:getAddressForProjectionApi" %}";
+            var post_data = {
+                "lat":lat,
+                "lon":lon,
+            }
+
+            $.ajax({
+                type: "POST",
+                url: url,
+                data: JSON.stringify(post_data),
+                success: function (response) {
+                    callback(response);
+                },
+            });
         }
     </script>
 {% endblock %}

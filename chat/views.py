@@ -11,7 +11,7 @@ def poiFinal(request):
 
 
 def gpsFinal(request):
-    return render(request, 'chat/proto03-gps.html')
+    return render(request, 'chat/fin03-gps.html')
 
 
 # old methods

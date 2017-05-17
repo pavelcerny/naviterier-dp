@@ -114,7 +114,7 @@
             this.goSecond = function () {
                 //validate
                 console.log('launched go second');
-                self.validate(function () {
+                self.validateInputField(function () {
                     self.firstPart = false;
                     self.drawGui();
                     var val = self.$text.val();
@@ -133,7 +133,7 @@
                 this.$alert1.show();
             }
 
-            this.validate = function (success) {
+            this.validateInputField = function (success) {
                 var val = this.$text.val();
                 //check if empty
                 if (val == '') {

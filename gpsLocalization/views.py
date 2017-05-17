@@ -82,7 +82,7 @@ def locateMeAPI(request):
         'segmentsTraveled': segments_traveled
     }
 
-    return HttpResponse(json.dumps(json_object))
+    return HttpResponse(json.dumps(json_object), content_type="application/json")
 
 
 

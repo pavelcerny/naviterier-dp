@@ -1,7 +1,9 @@
-{% block apis %}
+{% block gps %}
     <!-- geolocalization -->
     <script>
         function Gps(status_id, callback) {
+            var self = this;
+
             this.$status = $("#" + status_id);
             this.callback = callback;
             this.geo_options = {
@@ -17,7 +19,7 @@
                     Longitude: position.coords.longitude,
                     Accuracy: position.coords.accuracy,
                 };
-                this.callback(coords);
+                self.callback(coords);
             }
 
             this.geo_error = function () {
@@ -27,15 +29,46 @@
             this.startGps = function () {
                 if ("geolocation" in navigator) {
                     /* geolocation is available */
-                    this.$status.html("Spouštím GPS a určuji tvou přesnou pozici");
-                    var watchID = navigator.geolocation.watchPosition(this.geo_success.bind(this), this.geo_error.bind(this), this.geo_options);
+                    self.$status.html("Spouštím GPS a určuji tvou přesnou pozici");
+                    var watchID = navigator.geolocation.watchPosition(self.geo_success, self.geo_error, self.geo_options);
                 } else {
                     /* geolocation IS NOT available */
-                    this.$status.html("Geolokace v prohlížeči nefunguje. Zkus ji zapnout a znovu načíst stránku!")
+                    self.$status.html("Geolokace v prohlížeči nefunguje. Zkus ji zapnout a znovu načíst stránku!")
                 }
             }
 
             this.startGps();
+        }
+
+        function Compass(status_id, callback) {
+            var self = this;
+
+            this.$status = $("#" + status_id);
+            this.callback = callback;
+
+
+            if (window.DeviceOrientationEvent) {
+                self.$status.html("Cool! DeviceOrientationEvent API je podporován tímto přístrojem.");
+                self.$status.hide();
+
+                window.addEventListener('deviceorientation', function (eventData) {
+                    // gamma: Tilting the device from left to right. Tilting the device to the right will result in a positive value.
+                    var tiltLR = eventData.gamma;
+
+                    // beta: Tilting the device from the front to the back. Tilting the device to the front will result in a positive value.
+                    var tiltFB = eventData.beta;
+
+                    // alpha: The direction the compass of the device aims to in degrees.
+                    var dir = (360 - eventData.alpha) % 360;
+
+                    // Call the function to use the data on the page.
+                    self.callback(tiltLR, tiltFB, dir);
+                }, false);
+            } else {
+                self.$status.html("Špatné! DeviceOrientationEvent API není podporován tímto přístrojem.");
+                self.$status.show();
+            }
+            ;
         }
 
 

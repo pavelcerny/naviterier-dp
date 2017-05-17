@@ -87,12 +87,12 @@
             this.goNext = function () {
                 //validate
                 console.log('launched go next');
-                self.validate(function () {
+                self.validateInputField(function () {
                     self.textWatson(self.drawGui);
                 });
             }
 
-            this.validate = function (success) {
+            this.validateInputField = function (success) {
                 var val = self.$answer.val();
                 //check if empty
                 if (val == '') {
@@ -160,9 +160,9 @@
                     type: "POST",
                     url: url,
                     data: post_data,
-                    success: function (data) {
-                        //alert(data);
-                        var response = JSON.parse(data);
+                    success: function (response) {
+                        //alert(response);
+
                         self.context = response.context;
                         self.question = response.output.text;
                         self.done = self.isDialogDone(response.output);
@@ -228,7 +228,7 @@
             }
 
             this.startNavigation = function () {
-                alert(JSON.stringify(self.navigationDetails));
+                //alert(JSON.stringify(self.navigationDetails));
                 var targetAddress = self.navigationDetails["TargetStreet"] + " " + self.navigationDetails["TargetLandregistryNumber"];
                 self.getSourceAddress(function (sourceAddress) {
 
@@ -304,7 +304,7 @@
             this.goSecond = function () {
                 //validate
                 console.log('launched go second');
-                self.validate(function () {
+                self.validateInputField(function () {
                     self.firstPart = false;
                     self.drawGui();
                     var val = self.$text.val();
@@ -323,7 +323,7 @@
                 this.$alert1.show();
             }
 
-            this.validate = function (success) {
+            this.validateInputField = function (success) {
                 var val = this.$text.val();
                 //check if empty
                 if (val == '') {
