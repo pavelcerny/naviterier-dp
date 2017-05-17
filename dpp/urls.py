@@ -7,7 +7,7 @@ urlpatterns = [
     # here add the views
 
     # API
-    url(r'^update$', views.update, name='update'),
+    # url(r'^update$', views.update, name='update'),
     url(r'^find$', views.find, name='find'),
 
 ]

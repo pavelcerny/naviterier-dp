@@ -33,7 +33,7 @@ class Route(models.Model):
     route_id = models.CharField(max_length=12, primary_key=True)
     agency = models.ForeignKey(Agency, on_delete=None)
     route_short_name = models.CharField(max_length=12)
-    route_long_name = models.CharField(max_length=50)
+    route_long_name = models.CharField(max_length=150)
     route_type = models.IntegerField()
     route_color = models.CharField(max_length=12)
 
