@@ -7,6 +7,6 @@ urlpatterns = [
     # here add the views
 
     # API
-    url(r'^updateaddresses$', views.updateAddressesDbAPI, name='updateAdresses'),
+    url(r'^update$', views.updateAddressesDbAPI, name='updateAdresses'),
     url(r'^isaddressindb$', views.isAddressInDbAPI, name='isAddressInDb'),
 ]
