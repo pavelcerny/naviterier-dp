@@ -322,17 +322,17 @@
                     self.logingEnabled = false;
                     var targetAddress = self.$ui1_address.val();
                     //-----
-                    getAddressOnSidewalk(50.076927, 14.419260, function (response2) {
-                        redirectToNavigation(response2, targetAddress, "{{ request.url }}");
-                    });
+                    {#                    getAddressOnSidewalk(50.076927, 14.419260, function (response2) {#}
+                    {#                        redirectToNavigation(response2, targetAddress, "{{ request.url }}");#}
+                    {#                    });#}
 
                     //------
-                    {#                    gpsFromUserPath(self.userPath, function (response) {#}
-                    {#                        var myPosition = response.userCoordinates;#}
-                    {#                        getAddressOnSidewalk(myPosition.lat,myPosition.lon, function (response2) {#}
-                    {#                            redirectToNavigation(response2, targetAddress, "{{ request.url }}");#}
-                    {#                        });#}
-                    {#                    })#}
+                    gpsFromUserPath(self.userPath, function (response) {
+                        var myPosition = response.userCoordinates;
+                        getAddressOnSidewalk(myPosition.lat, myPosition.lon, function (response2) {
+                            redirectToNavigation(response2, targetAddress, "{{ request.url }}");
+                        });
+                    })
 
                 })
             }
