@@ -4,7 +4,8 @@ from datetime import datetime
 from dpp.models import Trip, Stop_time, Calendar_date, Route, Shape, Stop, Calendar, Agency
 
 
-FILE_PATH = "C:/Users/cerny/Documents/fel/DIP/In Python/chat_demo/dpp/dpp_data/"
+# FILE_PATH = "C:/Users/cerny/Documents/fel/DIP/In Python/chat_demo/dpp/dpp_data/"
+FILE_PATH = "/home/naviterier/naviterier-dp/dpp/dpp_data/"
 
 
 def loadCSVToModel(filename, first_column_name, loadFunction):
