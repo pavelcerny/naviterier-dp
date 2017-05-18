@@ -53,7 +53,7 @@
         jQuery(document).ready(function () {
             hideVoiceIfNotSupported("voiceInputButton");
             search1 = new Search("InputTargetAddress", "ui1_alert", "ui2_alert", "ui2_alert2", "submitTargetAddress", "buttonBackToFirst",
-                "buttonStart", "accuracyText", "ui-1", "ui-2", "inputLabel", "accuracyLabel");
+                "buttonStart", "accuracyText", "ui-1", "ui-2", "voiceInputButton");
             voice1 = new VoiceRecognition("voiceInputButton", "InputTargetAddress", search1.goSecond);
         });
     </script>
@@ -76,7 +76,7 @@
 
     <script>
         function Search(text_id, alert1_id, alert2_id, alert2_2_id, goSecond_id, goFirst_id, goStart_id, gpsStatus_id, firstPart_id,
-                        secondPart_id, focuspoint1, focuspoint2) {
+                        secondPart_id, focuspoint1) {
 
             var self = this;
 
@@ -91,8 +91,7 @@
             this.$secondPart = $('#' + secondPart_id);
             this.$start = $('#' + goStart_id);
             this.$gpsStatus = $('#' + gpsStatus_id);
-            this.$focuspoint1 = $('#' + focuspoint2);
-            this.$focuspoint2 = $('#' + focuspoint1);
+            this.$focuspoint1 = $('#' + focuspoint1);
 
             this.firstPart = true;
 
@@ -107,7 +106,7 @@
                 self.$alert2.hide();
                 self.$alert3.hide();
                 self.drawGui();
-                self.$text.focus();
+                //self.$focuspoint1.focus();
 
             }
 
@@ -115,11 +114,11 @@
                 if (this.firstPart) {
                     this.$firstPart.show();
                     this.$secondPart.hide();
-                    this.$focuspoint1.focus();
+                    //this.$focuspoint1.focus();
                 } else {
                     this.$firstPart.hide();
                     this.$secondPart.show();
-                    this.$focuspoint2.focus();
+                    //this.$focuspoint2.focus();
                 }
             }
 
@@ -137,7 +136,7 @@
             this.goFirst = function () {
                 self.firstPart = true;
                 self.drawGui();
-                self.$text.focus();
+                self.$focuspoint1.focus();
 
             }
 
@@ -167,13 +166,13 @@
                             if (inNaviterier.street) {
                                 // just wrong number
                                 self.handleInvalidAddress('Číslo ' + '\'' + inNaviterier.input.number + '\' není v naší databázi' +
-                                    ' adres, zkus zadat adresu s jiným číslem');
+                                    ' adres, zkus zadat adresu s jiným číslem.');
 
                                 return false;
                             } else {
                                 // wrong street
                                 self.handleInvalidAddress('Ulice ' + '\'' + inNaviterier.input.street + '\' není v naší databázi' +
-                                    ' adres, zkontroluj jestli nemáš překlep, nebo zkus jinou ulici');
+                                    ' adres, zkontroluj jestli nemáš překlep, nebo zkus jinou ulici.');
 
                                 return false;
                             }
