@@ -3,17 +3,23 @@
 {% block body %}
 
     <body>
-    <h1>Rozcestník</h1>
+    <div class="text-center">
+        <h2>Prototypy</h2>
+       
 
-    <ul>
-        <li><a href="{% url 'chat:reversegeocoding' %}">A - reverse geocoding</a></li>
-        <li><a href="{% url 'chat:poi' %}">B - poi</a></li>
-        <li><a href="{% url 'chat:gpsandcompass' %}">C - gps and compass</a></li>
+        <div><a href="{% url 'chat:reversegeocoding' %}">A - reverse geocoding</a></div>
+        <div><a href="{% url 'chat:poi' %}">B - poi</a></div>
+        <div><a href="{% url 'chat:gpsandcompass' %}">C - gps and compass</a></div>
+
         <br>
-        <li><a href="{% url 'chat:showCompass' %}">show compass</a></li>
-        <li><a href="{% url 'chat:clicker' %}">clicker</a></li>
-        <li><a href="{% url 'chat:navigateExample' %}">navigate Example</a></li>
-        <li><a href="{% url 'chat:navigate' %}">navigate</a></li>
-    </ul>
+
+        <h2>Nástroje</h2>
+
+        <div><a href="{% url 'chat:showCompass' %}">show compass</a></div>
+        <div><a href="{% url 'chat:clicker' %}">clicker</a></div>
+        <div><a href="{% url 'chat:navigateExample' %}">navigate Example</a></div>
+        <div><a href="{% url 'chat:navigate' %}">navigate</a></div>
+
+    </div>
 
 {% endblock %}
