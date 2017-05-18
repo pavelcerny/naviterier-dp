@@ -11,12 +11,17 @@
     <!-- UI -->
     <div id="ui-1">
         <form id="targetForm" method="get" action="" onsubmit="event.preventDefault(); gpsCompas1.goSecond()">
-            <div id="ui1_alert" role="alert" class="feedback"></div>
-            <label id="inputLabel" for="InputTargetAddress">Kam jdeš?</label>
-            <button type="button" id="voiceInputButton" onclick="voice1.processVoiceRecording()">Zadat hlasem</button>
-            <input type="text" id="InputTargetAddress" name="TargetAddress" placeholder="např. Myslíkova 22"/>
+            <div id="ui1_alert" role="alert" class="feedback alert alert-danger"></div>
+            <div class="form-group">
+                <label id="inputLabel" for="InputTargetAddress">Kam jdeš?</label>
+                <button type="button" class="btn btn-default" id="voiceInputButton"
+                        onclick="voice1.processVoiceRecording()">Diktuj
+                </button>
+                <input type="text" id="InputTargetAddress" class="form-control" name="TargetAddress"
+                       placeholder="např. Myslíkova 22"/>
+            </div>
 
-            <input id="submitTargetAddress" type="submit" value="Dál">
+            <input id="submitTargetAddress" class="btn btn-primary" type="submit" value="Dál">
         </form>
     </div>
 
@@ -25,25 +30,34 @@
         <div id="targetConfirmation">cíl: ...</div>
         <div id="command">Načítám Gps...</div>
         <div id="ui2_alert" role="alert" class="feedback"></div>
-        <div id="directions"></div>
-        <div id="percentage"></div>
-        <button id="iGoLeft" onclick="gpsCompas1.goThird()">jdu doleva</button>
-        <button id="iGoRight" onclick="gpsCompas1.goThird()">jdu doprava</button>
-        <button id="backToFirst" onclick="gpsCompas1.goFirst()">zpět, změň adresu</button>
+        <div aria-live="polite">
+            <span id="directions">
+
+            </span><span id="percentage"></span>
+        </div>
+
+        <div class="form-group">
+            <button id="iGo" class="btn btn-primary" onclick="gpsCompas1.goThird()">jdu doleva</button>
+            {#            <button id="iGoRight" class="btn btn-primary" onclick="gpsCompas1.goThird()">jdu doprava</button>#}
+        </div>
+        <button id="backToFirst" class="btn btn-default" onclick="gpsCompas1.goFirst()">změnit cíl</button>
     </div>
 
     <div id="ui-3">
-        <div id="goToCorner">Jdi dál až na první roh, nebo křižovatku</div>
-        <div id="goToCornerProgress"></div>
-        <div id="ui3_alert" role="alert" class="feedback"></div>
-        <button id="iAmOnCorner" onclick="gpsCompas1.goFourth()">Jsem na rohu</button>
+        <div id="ui3_alert" role="alert" class="feedback alert-warning"></div>
+        <div id="goToCorner" aria-live="assertive">Jdi dál až na první roh, nebo křižovatku</div>
+        <div><span>nasbíraných GPS pozic: </span><span id="goToCornerProgress" aria-live="polite"></span></div>
+        <button id="iAmOnCorner" class="btn btn-primary" onclick="gpsCompas1.goFourth()">Jsem na rohu</button>
     </div>
 
     <div id="ui-4">
-        <div id="goAfterCorner">Zahni za roh a pokračuj cca 30 metrů</div>
-        <div id="goAfterCornerProgress"></div>
-        <div id="ui4_alert" role="alert" class="feedback"></div>
-        <button id="startNavigation" onclick="gpsCompas1.startNavigation()">Urči mou pozici & zahaj navigaci</button>
+        <div id="ui4_alert" role="alert" class="feedback alert-warning"></div>
+        <div id="goAfterCorner" aria-live="assertive">Zahni za roh a pokračuj cca 30 metrů</div>
+
+        <div><span>nasbíraných GPS pozic: </span><span id="goAfterCornerProgress" aria-live="polite"></span></div>
+        <button id="startNavigation" class="btn btn-primary" onclick="gpsCompas1.startNavigation()">Urči mou pozici &
+            zahaj navigaci
+        </button>
     </div>
 
 {% endblock %}
@@ -70,7 +84,7 @@
             hideVoiceIfNotSupported("voiceInputButton");
             gpsCompas1 = new GpsCompass("ui-1", "ui-2", "ui-3", "ui-4", "ui1_alert", "ui2_alert", "ui3_alert", "ui4_alert",
                 "InputTargetAddress", "targetConfirmation",
-                "command", "directions", "percentage", "goToCornerProgress", "goAfterCornerProgress");
+                "command", "directions", "percentage", "goToCornerProgress", "goAfterCornerProgress", "iGo");
             voice1 = new VoiceRecognition("voiceInputButton", "InputTargetAddress", gpsCompas1.goSecond);
         });
     </script>
@@ -93,7 +107,7 @@
     <script>
         function GpsCompass(ui1_id, ui2_id, ui3_id, ui4_id, ui1_alert, ui2_alert, ui3_alert, ui4_alert,
                             ui1_address, ui2_addressConfirmation,
-                            ui2_command, ui2_routeStarts, $ui2_routeStartsPercentage, ui3_progress, ui4_progress) {
+                            ui2_command, ui2_routeStarts, $ui2_routeStartsPercentage, ui3_progress, ui4_progress, ui2_buttonIGo) {
             var self = this;
 
             // define class properties
@@ -112,6 +126,7 @@
             this.$ui2_routeStartsPercentage = $('#' + $ui2_routeStartsPercentage);
             this.$ui3_progress = $('#' + ui3_progress);
             this.$ui4_progress = $('#' + ui4_progress);
+            this.$ui2_buttonIGo = $('#' + ui2_buttonIGo);
 
 
             this.currentui = 1;
@@ -126,6 +141,8 @@
             this.userAngle = 0;
             this.userGpsReady = false;
             this.userCompassReady = false;
+            this.lastLeftPercentage = 0;
+            this.firstRunPercentage = true;
 
             this.nBeforeCornerColected = 0;
             this.nAfterCornerColected = 0;
@@ -141,22 +158,22 @@
                 //return true;
                 switch (self.currentui) {
                     case 1:
-                        self.$ui1.show();
                         self.$ui2.hide();
                         self.$ui3.hide();
                         self.$ui4.hide();
+                        self.$ui1.show();
                         break;
                     case 2:
                         self.$ui1.hide();
-                        self.$ui2.show();
                         self.$ui3.hide();
                         self.$ui4.hide();
+                        self.$ui2.show();
                         break;
                     case 3:
                         self.$ui1.hide();
                         self.$ui2.hide();
-                        self.$ui3.show();
                         self.$ui4.hide();
+                        self.$ui3.show();
                         break;
                     case 4:
                         self.$ui1.hide();
@@ -172,6 +189,7 @@
             this.goFirst = function () {
                 self.currentui = 1;
                 self.drawGui();
+                self.firstRunPercentage = true;
             }
 
             this.goSecond = function () {
@@ -182,7 +200,7 @@
                     self.drawGui();
                     var val = self.$ui1_address.val();
                     self.targetAddress = val;
-                    self.$ui2_addressConfirmation.html("Výlet do " + self.targetAddress);
+                    self.$ui2_addressConfirmation.html("Pěšky do " + self.targetAddress);
                     self.$ui2_command.html("načítám pozici cíle...")
                     self.getTargetCoords(function () {
                         // target coords loaded
@@ -401,22 +419,40 @@
 
                 self.$ui2_alert.html('');
                 self.$ui2_alert.hide();
-                self.$ui2_command.html("stoupni si zády k budově");
+                //self.$ui2_command.html("stoupni si zády k budově");
                 self.showDirection(leftPercentage);
 
             }
 
             this.showDirection = function (leftPercentage) {
                 var left = Math.round(leftPercentage / 10) * 10;
-                var text = "tvůj výlet začíná na";
-                var percentage;
-                if (left > 50) {
-                    percentage = left + "% doleva";
-                } else {
-                    percentage = 100 - left + "% doprava";
+                var direction = "doleva";
+                var basetext = "Stoupni si zády k budově a vydej se ";
+                var text = basetext + direction;
+
+                if (self.firstRunPercentage) {
+                    self.$ui2_command.html('');
+                    self.$ui2_command.hide();
+
+                    self.$ui2_routeStarts.html(text);
+                    self.$ui2_buttonIGo.html('jdu ' + direction);
+                    //self.$ui2_routeStartsPercentage.html('doleva');
+                    self.firstRunPercentage = false;
                 }
-                self.$ui2_routeStarts.html(text);
-                self.$ui2_routeStartsPercentage.html(percentage);
+
+
+                if ((self.lastLeftPercentage - left + 100) % 100 > 15) {
+                    if (left > 50) {
+                        direction = "doleva";
+                    } else {
+                        direction = "doprava";
+                    }
+                    //self.$ui2_routeStartsPercentage.html(direction);
+                    self.$ui2_routeStarts.html(basetext + direction);
+                    self.$ui2_buttonIGo.html('jdu ' + direction);
+                    self.lastLeftPercentage = left;
+                }
+
             }
 
             this.logGpsCoords = function () {
@@ -442,7 +478,7 @@
             }
 
             this.redrawBeforeCorner = function () {
-                self.$ui3_progress.html(self.nBeforeCornerColected);
+                self.$ui3_progress.html(self.nBeforeCornerColected + '');
                 if (self.nBeforeCornerColected > self.minimumLogedCoords - 1) {
                     self.$ui3_alert.html('');
                     self.$ui3_alert.hide();
@@ -461,356 +497,12 @@
             this.gps = new Gps("ui2_command", this.processGpsSignal);
             this.compass = new Compass(ui2_alert, this.processCompassInfo);
             this.drawGui();
+            this.$ui1_alert.hide();
+            this.$ui2_alert.hide();
+            this.$ui3_alert.hide();
+            this.$ui4_alert.hide();
 
 
         }
-    </script>
-
-    <script>
-        function Watson(question_id, answer_id, send_id, alert_id) {
-            var self = this;
-
-            this.$question = $('#' + question_id);
-            this.$answer = $('#' + answer_id);
-            this.$send = $('#' + send_id);
-            this.$alert = $('#' + alert_id);
-
-            this.context = '';
-            this.question = '';
-            this.done = false;
-            this.methodMhd = false;
-
-            this.navigationDetails = null;
-
-            this.alert = function (alert_text) {
-                self.$alert.html(alert_text);
-                self.$alert.show();
-            }
-
-            this.noAlert = function () {
-                self.$alert.html('');
-                self.$alert.hide();
-            }
-
-            this.goNext = function () {
-                //validate
-                console.log('launched go next');
-                self.validateInputField(function () {
-                    self.textWatson(self.drawGui);
-                });
-            }
-
-            this.validateInputField = function (success) {
-                var val = self.$answer.val();
-                //check if empty
-                if (val == '') {
-                    this.handleInputError('Zapomněl jsi zadat odpověď.');
-
-                    return false;
-                }
-
-                self.$answer.attr('aria-invalid', 'false');
-                self.$alert.html('');
-                self.$alert.hide();
-
-                success();
-                return true;
-            }
-
-            this.handleInputError = function (message) {
-                self.$answer.attr('aria-invalid', 'true');
-                self.$alert.html(message);
-                self.$alert.show();
-            }
-
-            this.isDialogDone = function (output) {
-                if (output.done === 'undefined') {
-                    return false;
-                } else {
-                    return output.done;
-                }
-            }
-
-            this.setNavigationDetails = function () {
-                var navigationDetails = {
-                    "TargetLandregistryNumber": self.context.TargetLandregistryNumber,
-                    "TargetStreet": self.context.TargetStreet,
-                }
-
-                if (self.methodMhd) {
-                    navigationDetails["StartLineDirection"] = self.context.StartLineDirection;
-                    navigationDetails["StartLineNumber"] = self.context.StartLineNumber;
-                    navigationDetails["StartStopName"] = self.context.StartStopName;
-                } else {
-                    navigationDetails["StartStreet"] = self.context.StartStreet;
-                    navigationDetails["StartLandregistryNumber"] = self.context.StartLandregistryNumber;
-                }
-                self.navigationDetails = navigationDetails;
-            }
-
-
-            this.isMethodMhd = function (output) {
-                if (output.methodMhd === 'undefined') {
-                    return false;
-                } else {
-                    return output.methodMhd;
-                }
-            }
-
-            this.textWatson = function (callback) {
-                var url = "{% url 'chat:watson_response' %}";
-                var post_data = {
-                    csrfmiddlewaretoken: "{{ csrf_token }}",
-                    context: self.context,
-                    text: self.$answer.val(),
-                };
-                $.ajax({
-                    type: "POST",
-                    url: url,
-                    data: post_data,
-                    success: function (data) {
-                        //alert(data);
-                        var response = JSON.parse(data);
-                        self.context = response.context;
-                        self.question = response.output.text;
-                        self.done = self.isDialogDone(response.output);
-                        self.methodMhd = self.isMethodMhd(response.output);
-                        callback();
-                    }
-                })
-            }
-
-            this.drawGui = function () {
-                self.displayMessage(self.question);
-                self.$answer.val('');
-                if (self.done) {
-                    self.setNavigationDetails();
-                    self.startNavigation();
-                }
-            }
-
-            this.displayMessage = function (message) {
-                self.$question.html(message);
-            }
-
-            this.getSourceAddress = function (callback) {
-                if (self.methodMhd) {
-                    var direction = self.navigationDetails["StartLineDirection"];
-                    var line = self.navigationDetails["StartLineNumber"];
-                    var stop = self.navigationDetails["StartStopName"];
-
-
-                    getAddressFromTriple(stop, direction, line, callback)
-                } else {
-                    var sourceAddress = self.navigationDetails["StartStreet"] + " " + self.navigationDetails["StartLandregistryNumber"];
-                    callback(sourceAddress)
-                }
-            }
-
-            this.validateInNaviterier = function (inNaviterier, successFunction) {
-                if (inNaviterier.streetAndHouseNumber) {
-                    //cool
-                } else if (inNaviterier.streetAndLandRegistryNumber) {
-                    //cool
-                } else {
-                    // wrong number
-                    if (inNaviterier.street) {
-                        // just wrong number
-                        self.alert('Číslo ' + '\'' + inNaviterier.input.number + '\' není v naší databázi' +
-                            ' adres, zkus zadat adresu s jiným číslem');
-
-                        return false;
-                    } else {
-                        // wrong street
-                        self.alert('Ulice ' + '\'' + inNaviterier.input.street + '\' není v naší databázi' +
-                            ' adres, zkontroluj jestli nemáš překlep, nebo zkus jinou ulici');
-
-                        return false;
-                    }
-                }
-
-                self.noAlert();
-
-                successFunction();
-                return true;
-            }
-
-            this.startNavigation = function () {
-                alert(JSON.stringify(self.navigationDetails));
-                var targetAddress = self.navigationDetails["TargetStreet"] + " " + self.navigationDetails["TargetLandregistryNumber"];
-                self.getSourceAddress(function (sourceAddress) {
-
-                    inNaviterierDB(sourceAddress, function (response) {
-                        // if source address is in DB
-                        var inNaviterier = JSON.parse(response)
-                        self.validateInNaviterier(inNaviterier, function () {
-
-                            inNaviterierDB(targetAddress, function (response) {
-                                //if target address is in DB
-                                var inNaviterier = JSON.parse(response);
-                                self.validateInNaviterier(inNaviterier, function () {
-
-                                    //everything ok
-                                    redirectToNavigation(sourceAddress, targetAddress, "{{ request.url }}");
-                                })
-                            })
-                        })
-                    })
-                });
-            }
-
-            this.textWatson(this.drawGui);
-
-
-        }
-    </script>
-
-    <script>
-        function Search(text_id, alert1_id, alert2_id, goSecond_id, goFirst_id, goStart_id, gpsStatus_id, firstPart_id,
-                        secondPart_id, focuspoint1, focuspoint2) {
-
-            var self = this;
-
-            // define class properties
-            this.$text = $('#' + text_id);   // the jQuery object pointer to the text box
-            this.$gosecond = $('#' + goSecond_id); // the jQuery object pointer to the check guess button
-            this.$gofirst = $('#' + goFirst_id); // the jQuery object pointer to the check guess button
-            this.$alert1 = $('#' + alert1_id); // the jQuery object pointer to the alert area
-            this.$alert2 = $('#' + alert2_id); // the jQuery object pointer to the alert area
-            this.$firstPart = $('#' + firstPart_id); // the jQuery object pointer to the alert area
-            this.$secondPart = $('#' + secondPart_id); // the jQuery object pointer to the alert area
-            this.$start = $('#' + goStart_id); // the jQuery object pointer to the alert area
-            this.$gpsStatus = $('#' + gpsStatus_id); // the jQuery object pointer to the alert area
-            this.$focuspoint1 = $('#' + focuspoint2); // the jQuery object pointer to the alert area
-            this.$focuspoint2 = $('#' + focuspoint1); // the jQuery object pointer to the alert area
-
-            this.firstPart = true;
-
-            this.prevAccuracy = 999;
-            this.shownAccuracy = 999;
-            this.coords = null;
-
-            this.newSearch = function () {
-                // set i am in the first part
-                this.firstPart = true;
-                this.drawGui();
-
-            }
-
-            this.drawGui = function () {
-                if (this.firstPart) {
-                    this.$firstPart.show();
-                    this.$secondPart.hide();
-                    this.$focuspoint1.focus();
-                } else {
-                    this.$firstPart.hide();
-                    this.$secondPart.show();
-                    this.$focuspoint2.focus();
-                }
-            }
-
-            this.goSecond = function () {
-                //validate
-                console.log('launched go second');
-                self.validateInputField(function () {
-                    self.firstPart = false;
-                    self.drawGui();
-                    var val = self.$text.val();
-                    self.$start.html("Spustit navigaci na " + val);
-                });
-            }
-
-            this.goFirst = function () {
-                this.firstPart = true;
-                this.drawGui();
-            }
-
-            this.handleInputError = function (message) {
-                this.$text.attr('aria-invalid', 'true');
-                this.$alert1.html(message);
-                this.$alert1.show();
-            }
-
-            this.validateInputField = function (success) {
-                var val = this.$text.val();
-                //check if empty
-                if (val == '') {
-                    this.handleInvalidAddress('Zapomněl jsi vyplnit kam to bude.');
-
-                    return false;
-                } else
-                //check if in db
-                    inNaviterierDB(val, function (inNaviterier) {
-                        inNaviterier = JSON.parse(inNaviterier);
-                        if (inNaviterier.streetAndHouseNumber) {
-                            //cool
-                        } else if (inNaviterier.streetAndLandRegistryNumber) {
-                            //cool
-                        } else {
-                            // wrong number
-                            if (inNaviterier.street) {
-                                // just wrong number
-                                self.handleInvalidAddress('Číslo ' + '\'' + inNaviterier.input.number + '\' není v naší databázi' +
-                                    ' adres, zkus zadat adresu s jiným číslem');
-
-                                return false;
-                            } else {
-                                // wrong street
-                                self.handleInvalidAddress('Ulice ' + '\'' + inNaviterier.input.street + '\' není v naší databázi' +
-                                    ' adres, zkontroluj jestli nemáš překlep, nebo zkus jinou ulici');
-
-                                return false;
-                            }
-                        }
-
-                        self.$text.attr('aria-invalid', 'false');
-                        self.$alert1.html('');
-                        self.$alert1.hide();
-
-                        success();
-                        return true;
-                    });
-            }
-
-            this.startNavigation = function () {
-                var targetAddress = this.$text.val();
-                if (this.validateGps()) {
-                    getAddress(coords.Latitude, coords.Longitude, function (sourceAddress) {
-                        if (inNaviterierDB(sourceAddress)) {
-                            redirectToNavigation(sourceAddress, targetAddress, "{{ request.url }}");
-                        } else {
-                            this.$alert2.html('Nejsi v oblasti pokryté naviterierem. Přesuň se víc do centra Prahy.')
-                        }
-                    }.bind(this));
-                }
-            }
-
-            this.validateGps = function () {
-                if (this.coords == null) {
-                    this.$alert1.html('gps nevrací žádnou pozici');
-                    return false;
-                }
-                return true;
-            }
-
-            this.showGpsStatus = function (newValue) {
-                this.prevAccuracy = this.shownAccuracy;
-                this.shownAccuracy = Math.round(newValue);
-                // when accuracy changes for at least 10m
-                if (Math.abs(this.prevAccuracy - this.shownAccuracy) >= 5) {
-                    this.$gpsStatus.html("+-" + this.shownAccuracy + "m. ");
-                }
-            }
-
-            this.updateGpsGeolocation = function (coords) {
-                this.coords = coords;
-                this.showGpsStatus(this.coords.Accuracy);
-            }
-
-            // initialize the new search
-            this.newSearch();
-            this.gps = new Gps(gpsStatus_id, this.updateGpsGeolocation.bind(this))
-        }
-
     </script>
 {% endblock %}

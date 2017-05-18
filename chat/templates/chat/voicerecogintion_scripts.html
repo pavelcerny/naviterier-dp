@@ -2,65 +2,98 @@
     <script>
         // HTML5 Speech Recognition API
 
-            function VoiceRecognition(buttonRecorId,inputId, onSuccess) {
-                var self = this;
-                this.$recordButton = $("#" + buttonRecorId);
-                this.$text = $("#" + inputId);
+        function VoiceRecognition(buttonRecorId, inputId, onSuccess) {
+            var self = this;
+            this.$recordButton = $("#" + buttonRecorId);
+            this.$text = $("#" + inputId);
+
+            //this.textToSpeech = new TextToSpeech();
 
 
-                this.handleRecognizedText = function (text) {
-                    self.$text.val(text);
-                }
+            this.handleRecognizedText = function (text) {
+                //self.textToSpeech.say(text);
+                self.$text.val(text);
+            }
 
-                this.processVoiceRecording = function () {
-                    if (window.hasOwnProperty('webkitSpeechRecognition')) {
+            this.processVoiceRecording = function () {
+                if (window.hasOwnProperty('webkitSpeechRecognition')) {
 
-                        var recognition = new webkitSpeechRecognition();
+                    var recognition = new webkitSpeechRecognition();
 
-                        recognition.continuous = false;
-                        recognition.interimResults = false;
+                    recognition.continuous = false;
+                    recognition.interimResults = false;
 
-                        recognition.lang = "cs-CZ";
-                        recognition.start();
-                        console.log('Ready to receive command');
+                    recognition.lang = "cs-CZ";
+                    recognition.start();
+                    console.log('Ready to receive command');
 
-                        var diagnostic = document.querySelector('.output');
-                        var cmd = document.querySelector('html');
+                    var diagnostic = document.querySelector('.output');
+                    var cmd = document.querySelector('html');
 
-                        recognition.onresult = function (e) {
-                            var commandReceived = e.results[0][0].transcript;
-                            recognition.stop();
-                            console.log('received '+commandReceived );
+                    recognition.onresult = function (e) {
+                        var commandReceived = e.results[0][0].transcript;
+                        recognition.stop();
+                        console.log('received ' + commandReceived);
 
-                            self.handleRecognizedText(commandReceived);
-                            self.sucessFunction();
-                        };
+                        self.handleRecognizedText(commandReceived);
+                        self.sucessFunction();
+                    };
 
-                        recognition.onerror = function (e) {
-                            recognition.stop();
-                        }
-
+                    recognition.onerror = function (e) {
+                        recognition.stop();
                     }
+
                 }
+            }
 
-                this.hideVoiceInputButton = function () {
-                    self.$recordButton.hide();
+            this.hideVoiceInputButton = function () {
+                self.$recordButton.hide();
+            }
+
+            this.drawVoiceInput = function () {
+                // hide voice input if not supported
+                if (!self.hasSpeechRecognition) {
+                    self.hideVoiceInputButton();
                 }
-
-                this.drawVoiceInput = function () {
-                    // hide voice input if not supported
-                    if (!self.hasSpeechRecognition) {
-                        self.hideVoiceInputButton();
-                    }
-                }
+            }
 
 
-
-                //initialize the class
-                this.hasSpeechRecognition = window.hasOwnProperty('webkitSpeechRecognition');
-                this.drawVoiceInput();
-                this.sucessFunction = onSuccess;
+            //initialize the class
+            this.hasSpeechRecognition = window.hasOwnProperty('webkitSpeechRecognition');
+            this.drawVoiceInput();
+            this.sucessFunction = onSuccess;
 
         }
+
+
+        function TextToSpeech() {
+            var self = this;
+            this.synth = window.speechSynthesis;
+            this.voice = null;
+
+
+            this.setVoice = function (lang) {
+                var voices = self.synth.getVoices();
+
+                for (var i =0; i< voices.length; i++){
+                    if (voices[i].lang == lang) {
+                        self.voice = voices[i];
+                        break;
+                    }
+                }
+            }
+
+            this.say = function (text) {
+                var utterThis = new SpeechSynthesisUtterance(text);
+                utterThis.voice = self.voice;
+                utterThis.pitch = 1;
+                utterThis.rate = 1;
+                //utterThis.lang = 'cs_CZ';
+                self.synth.speak(utterThis);
+            }
+
+            this.setVoice('cs_CZ');
+        }
+
     </script>
 {% endblock %}
