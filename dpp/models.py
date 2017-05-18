@@ -56,11 +56,12 @@ class Trip(models.Model):
 
 class Stop(models.Model):
     stop_id = models.CharField(max_length=12, primary_key=True)
-    stop_name = models.CharField(max_length=30)
+    stop_name = models.CharField(max_length=120)
     stop_lat = models.FloatField()
     stop_lon = models.FloatField()
     location_type = models.IntegerField()
-    parent_station = models.ForeignKey('self', on_delete=models.CASCADE, null=True)
+    # parent_station = models.ForeignKey('self', on_delete=models.CASCADE, null=True)
+    parent_station = models.models.CharField(max_length=30)
     wheelchair_boarding = models.IntegerField
 
 
