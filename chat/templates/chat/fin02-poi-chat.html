@@ -10,15 +10,19 @@
 
     <!-- UI -->
     <div id="ui-1">
-        <div id="question" aria-live="polite">Načítám dialog...</div>
+        <div id="question" aria-live="polite" class="text-center">Načítám dialog...</div>
 
         <!-- Search Form -->
         <form id="userReplyForm" method="get" action="" onsubmit="event.preventDefault(); watson1.goNext()">
             <div class="speech">
-                <div id="alert" role="alert" class="feedback"></div>
-                <input type="button" onclick="voice1.processVoiceRecording()" value="Namluvit odpověď"/>
-                <input type="text" id="inputAnswer" name="userReply" placeholder="Napsat odpověď" aria-haspopup="true"/>
-                <input type="submit" id="sendButton" value="Odeslat odpověď">
+                <div class="alert alert-danger" id="alert" role="alert" class="feedback"></div>
+                <div class="form-group">
+                    <input id="voiceInputButton" type="button" onclick="voice1.processVoiceRecording()"
+                           class="btn btn-default" value="Diktovat"/>
+                    <input type="text" id="inputAnswer" name="userReply" placeholder="Psát" class="form-control"
+                           aria-haspopup="true"/>
+                </div>
+                <input type="submit" id="sendButton" class="btn btn-primary" value="Odeslat">
             </div>
         </form>
     </div>
@@ -42,7 +46,7 @@
         jQuery(document).ready(function () {
             hideVoiceIfNotSupported("voiceInputButton");
             watson1 = new Watson("question", "inputAnswer", "sendButton", "alert");
-            voice1 = new VoiceRecognition("voiceInputButton", "InputTargetAddress", watson1.goNext);
+            voice1 = new VoiceRecognition("voiceInputButton", "inputAnswer", watson1.goNext);
         });
     </script>
 
@@ -254,157 +258,9 @@
             }
 
             this.textWatson(this.drawGui);
+            this.$alert.hide();
 
 
         }
-    </script>
-
-    <script>
-        function Search(text_id, alert1_id, alert2_id, goSecond_id, goFirst_id, goStart_id, gpsStatus_id, firstPart_id,
-                        secondPart_id, focuspoint1, focuspoint2) {
-
-            var self = this;
-
-            // define class properties
-            this.$text = $('#' + text_id);   // the jQuery object pointer to the text box
-            this.$gosecond = $('#' + goSecond_id); // the jQuery object pointer to the check guess button
-            this.$gofirst = $('#' + goFirst_id); // the jQuery object pointer to the check guess button
-            this.$alert1 = $('#' + alert1_id); // the jQuery object pointer to the alert area
-            this.$alert2 = $('#' + alert2_id); // the jQuery object pointer to the alert area
-            this.$firstPart = $('#' + firstPart_id); // the jQuery object pointer to the alert area
-            this.$secondPart = $('#' + secondPart_id); // the jQuery object pointer to the alert area
-            this.$start = $('#' + goStart_id); // the jQuery object pointer to the alert area
-            this.$gpsStatus = $('#' + gpsStatus_id); // the jQuery object pointer to the alert area
-            this.$focuspoint1 = $('#' + focuspoint2); // the jQuery object pointer to the alert area
-            this.$focuspoint2 = $('#' + focuspoint1); // the jQuery object pointer to the alert area
-
-            this.firstPart = true;
-
-            this.prevAccuracy = 999;
-            this.shownAccuracy = 999;
-            this.coords = null;
-
-            this.newSearch = function () {
-                // set i am in the first part
-                this.firstPart = true;
-                this.drawGui();
-
-            }
-
-            this.drawGui = function () {
-                if (this.firstPart) {
-                    this.$firstPart.show();
-                    this.$secondPart.hide();
-                    this.$focuspoint1.focus();
-                } else {
-                    this.$firstPart.hide();
-                    this.$secondPart.show();
-                    this.$focuspoint2.focus();
-                }
-            }
-
-            this.goSecond = function () {
-                //validate
-                console.log('launched go second');
-                self.validateInputField(function () {
-                    self.firstPart = false;
-                    self.drawGui();
-                    var val = self.$text.val();
-                    self.$start.html("Spustit navigaci na " + val);
-                });
-            }
-
-            this.goFirst = function () {
-                this.firstPart = true;
-                this.drawGui();
-            }
-
-            this.handleInputError = function (message) {
-                this.$text.attr('aria-invalid', 'true');
-                this.$alert1.html(message);
-                this.$alert1.show();
-            }
-
-            this.validateInputField = function (success) {
-                var val = this.$text.val();
-                //check if empty
-                if (val == '') {
-                    this.handleInvalidAddress('Zapomněl jsi vyplnit kam to bude.');
-
-                    return false;
-                } else
-                //check if in db
-                    inNaviterierDB(val, function (inNaviterier) {
-                        inNaviterier = JSON.parse(inNaviterier);
-                        if (inNaviterier.streetAndHouseNumber) {
-                            //cool
-                        } else if (inNaviterier.streetAndLandRegistryNumber) {
-                            //cool
-                        } else {
-                            // wrong number
-                            if (inNaviterier.street) {
-                                // just wrong number
-                                self.handleInvalidAddress('Číslo ' + '\'' + inNaviterier.input.number + '\' není v naší databázi' +
-                                    ' adres, zkus zadat adresu s jiným číslem');
-
-                                return false;
-                            } else {
-                                // wrong street
-                                self.handleInvalidAddress('Ulice ' + '\'' + inNaviterier.input.street + '\' není v naší databázi' +
-                                    ' adres, zkontroluj jestli nemáš překlep, nebo zkus jinou ulici');
-
-                                return false;
-                            }
-                        }
-
-                        self.$text.attr('aria-invalid', 'false');
-                        self.$alert1.html('');
-                        self.$alert1.hide();
-
-                        success();
-                        return true;
-                    });
-            }
-
-            this.startNavigation = function () {
-                var targetAddress = this.$text.val();
-                if (this.validateGps()) {
-                    getAddress(coords.Latitude, coords.Longitude, function (sourceAddress) {
-                        if (inNaviterierDB(sourceAddress)) {
-                            redirectToNavigation(sourceAddress, targetAddress, "{{ request.url }}");
-                        } else {
-                            this.$alert2.html('Nejsi v oblasti pokryté naviterierem. Přesuň se víc do centra Prahy.')
-                        }
-                    }.bind(this));
-                }
-            }
-
-            this.validateGps = function () {
-                if (this.coords == null) {
-                    this.$alert1.html('gps nevrací žádnou pozici');
-                    return false;
-                }
-                return true;
-            }
-
-            this.showGpsStatus = function (newValue) {
-                this.prevAccuracy = this.shownAccuracy;
-                this.shownAccuracy = Math.round(newValue);
-                // when accuracy changes for at least 10m
-                if (Math.abs(this.prevAccuracy - this.shownAccuracy) >= 5) {
-                    this.$gpsStatus.html("+-" + this.shownAccuracy + "m. ");
-                }
-            }
-
-            this.updateGpsGeolocation = function (coords) {
-                this.coords = coords;
-                this.showGpsStatus(this.coords.Accuracy);
-            }
-
-            // initialize the new search
-            this.newSearch();
-            this.gps = new Gps(gpsStatus_id, this.updateGpsGeolocation.bind(this))
-        }
-
     </script>
 {% endblock %}
