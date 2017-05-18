@@ -44,7 +44,7 @@ def isAddressInDbAPI(request):
             street += " "
         street += w
     if len(words) < 2:
-        number = 'nevyplnil jsi číslo'
+        number = 'prázdné'
     else:
         number = words[-1]
     response = json.dumps(isAddressInDB(street,number))
