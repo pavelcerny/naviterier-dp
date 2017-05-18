@@ -11,12 +11,16 @@
     <!-- UI -->
     <div id="ui-1">
         <form id="targetForm" method="get" action="" onsubmit="event.preventDefault(); search1.goSecond()">
-            <div id="ui1_alert" role="alert" class="feedback"></div>
-            <label id="inputLabel" for="InputTargetAddress">Kam jdeš?</label>
-            <button type="button" id="voiceInputButton" onclick="voice1.processVoiceRecording()">Zadat hlasem</button>
-            <input type="text" id="InputTargetAddress" name="TargetAddress" placeholder="např. Myslíkova 22"/>
-
-            <input id="submitTargetAddress" type="submit" value="Dál">
+            <div class="form-group">
+                <div class="alert alert-danger" id="ui1_alert" role="alert" class="feedback"></div>
+                <label id="inputLabel" for="InputTargetAddress">Kam jdeš?</label>
+                <button type="button" id="voiceInputButton" onclick="voice1.processVoiceRecording()"
+                        class="btn btn-default">Zadat hlasem
+                </button>
+                <input type="text" id="InputTargetAddress" name="TargetAddress" placeholder="např. Myslíkova 22"
+                       class="form-control"/>
+            </div>
+            <input id="submitTargetAddress" type="submit" value="Dál" class="btn btn-primary">
         </form>
     </div>
 
@@ -25,15 +29,17 @@
         <div id="accuracyLabel">aktuální přesnost:</div>
         <div id="accuracyText" aria-live="polite">sample accuracy text</div>
         <div id="ui2_alert" role="alert" class="feedback"></div>
-        <button id="buttonStart" onclick="search1.startNavigation()">Spustit Navigaci</button>
-        <button id="buttonBackToFirst" onclick="search1.goFirst()">Opravit</button>
+        <button id="buttonStart" onclick="search1.startNavigation()" class="btn btn-primary">Spustit Navigaci</button>
+        <button id="buttonBackToFirst" onclick="search1.goFirst()" class="btn btn-default">Opravit</button>
     </div>
 
+{% endblock %}
+
+{% block scripts %}
 
     <!-- scripts -->
     {% load static %}
     <script src="{% static "chat/voiceInput.js" %}"></script>
-    <script src="{% static "js/jquery.js" %}"></script>
     {% include 'chat/apis_scripts.html' %}
     {% include 'chat/voicerecogintion_scripts.html' %}
     {% include 'chat/gps_scripts.html' %}
@@ -47,7 +53,7 @@
             hideVoiceIfNotSupported("voiceInputButton");
             search1 = new Search("InputTargetAddress", "ui1_alert", "ui2_alert", "submitTargetAddress", "buttonBackToFirst",
                 "buttonStart", "accuracyText", "ui-1", "ui-2", "inputLabel", "accuracyLabel");
-            voice1 = new VoiceRecognition("voiceInputButton","InputTargetAddress", search1.goSecond);
+            voice1 = new VoiceRecognition("voiceInputButton", "InputTargetAddress", search1.goSecond);
         });
     </script>
 
@@ -94,8 +100,10 @@
 
             this.newSearch = function () {
                 // set i am in the first part
-                this.firstPart = true;
-                this.drawGui();
+                self.firstPart = true;
+                self.$alert1.hide();
+                self.$alert2.hide();
+                self.drawGui();
 
             }
 
@@ -152,7 +160,7 @@
                             // wrong number
                             if (inNaviterier.street) {
                                 // just wrong number
-                                self.handleInvalidAddress( 'Číslo ' + '\'' + inNaviterier.input.number + '\' není v naší databázi' +
+                                self.handleInvalidAddress('Číslo ' + '\'' + inNaviterier.input.number + '\' není v naší databázi' +
                                     ' adres, zkus zadat adresu s jiným číslem');
 
                                 return false;

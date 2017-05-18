@@ -16,19 +16,21 @@
         <form id="userReplyForm" method="get" action="" onsubmit="event.preventDefault(); watson1.goNext()">
             <div class="speech">
                 <div id="alert" role="alert" class="feedback"></div>
-                <input type="button" onclick="voice1.processVoiceRecording()" value="Odpověz hlasem"/>
-                <input type="text" id="inputAnswer" name="userReply" placeholder="Odpověz psaním" aria-haspopup="true"/>
-                <input type="submit" id="sendButton" value="Odešli textové pole">
+                <input type="button" onclick="voice1.processVoiceRecording()" value="Namluvit odpověď"/>
+                <input type="text" id="inputAnswer" name="userReply" placeholder="Napsat odpověď" aria-haspopup="true"/>
+                <input type="submit" id="sendButton" value="Odeslat odpověď">
             </div>
         </form>
     </div>
 
+{% endblock %}
+
+{% block scripts %}
 
 
     <!-- scripts -->
     {% load static %}
     <script src="{% static "chat/voiceInput.js" %}"></script>
-    <script src="{% static "js/jquery.js" %}"></script>
     {% include 'chat/apis_scripts.html' %}
     {% include 'chat/voicerecogintion_scripts.html' %}
 

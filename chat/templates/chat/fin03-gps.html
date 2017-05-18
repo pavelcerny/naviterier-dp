@@ -46,12 +46,14 @@
         <button id="startNavigation" onclick="gpsCompas1.startNavigation()">Urči mou pozici & zahaj navigaci</button>
     </div>
 
+{% endblock %}
+
+{% block scripts %}
 
 
     <!-- scripts -->
     {% load static %}
     <script src="{% static "chat/voiceInput.js" %}"></script>
-    <script src="{% static "js/jquery.js" %}"></script>
     <script src="{% static "chat/math.min.js" %}"></script>
     {% include 'chat/apis_scripts.html' %}
     {% include 'chat/voicerecogintion_scripts.html' %}
