@@ -7,11 +7,11 @@
 
 
 {% block body %}
-    <div id="question" aria-live="polite">Načítám dialog...</div>
-    <div id="divButtonStartJourney"><button id="buttonStartJourney" onclick="startJourney()">Jdu na to</button></div>
-    <div id="divButtonNextPart"><button id="buttonNextPart" onclick="nextPart()">Další úsek</button></div>
-    <div id="divButtonPreviousPart"><button id="buttonPreviousPart" onclick="previousPart()">Předchozí úsek</button></div>
-    <div id="divButtonBackToSetup"><button id="buttonBackToSetup" onclick="backToSetup()">zpět</button></div>
+    <div id="question" aria-live="polite" class="text-left">Načítám pokyny...</div>
+    <div id="divButtonStartJourney"><button id="buttonStartJourney" class="btn btn-primary" onclick="startJourney()">Jdu na to</button></div>
+    <div id="divButtonNextPart"><button id="buttonNextPart" class="btn btn-primary" onclick="nextPart()">Další úsek</button></div>
+    <div id="divButtonPreviousPart"><button id="buttonPreviousPart" class="btn btn-default" onclick="previousPart()">Předchozí úsek</button></div>
+    <div id="divButtonBackToSetup"><button id="buttonBackToSetup" class="btn btn-default" onclick="backToSetup()">Změnit zadání</button></div>
 
 
     <script src="{% static "js/jquery.js" %}"></script>

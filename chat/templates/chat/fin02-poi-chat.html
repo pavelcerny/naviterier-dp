@@ -10,12 +10,13 @@
 
     <!-- UI -->
     <div id="ui-1">
-        <div id="question" aria-live="polite" class="text-center">Načítám dialog...</div>
+        <div class="alert alert-danger" id="alert" role="alert" class="feedback"></div>
+        <div id="question" aria-live="polite" class="text-left">Načítám dialog...</div>
 
         <!-- Search Form -->
         <form id="userReplyForm" method="get" action="" onsubmit="event.preventDefault(); watson1.goNext()">
             <div class="speech">
-                <div class="alert alert-danger" id="alert" role="alert" class="feedback"></div>
+
                 <div class="form-group">
                     <input id="voiceInputButton" type="button" onclick="voice1.processVoiceRecording()"
                            class="btn btn-default" value="Diktovat"/>
@@ -102,7 +103,7 @@
                 var val = self.$answer.val();
                 //check if empty
                 if (val == '') {
-                    this.handleInputError('Zapomněl jsi zadat odpověď.');
+                    this.handleInputError('Zapomněl jsi napsat nebo nadiktovat odpověď.');
 
                     return false;
                 }
