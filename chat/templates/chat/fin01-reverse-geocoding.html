@@ -15,22 +15,23 @@
                 <div class="alert alert-danger" id="ui1_alert" role="alert" class="feedback"></div>
                 <label id="inputLabel" for="InputTargetAddress">Kam jdeš?</label>
                 <button type="button" id="voiceInputButton" onclick="voice1.processVoiceRecording()"
-                        class="btn btn-default">Zadat hlasem
+                        class="btn btn-default">Diktovat
                 </button>
                 <input type="text" id="InputTargetAddress" name="TargetAddress" placeholder="např. Myslíkova 22"
                        class="form-control"/>
             </div>
-            <input id="submitTargetAddress" type="submit" value="Dál" class="btn btn-primary">
+            <input id="submitTargetAddress" type="submit" value="Odeslat" class="btn btn-primary">
         </form>
     </div>
 
     <!-- UI2 -->
     <div id="ui-2">
-        <div id="accuracyLabel">aktuální přesnost:</div>
+        <div id="ui2_alert" class="alert alert-danger" role="alert" class="feedback"></div>
+        <div id="ui2_alert2" class="alert alert-info" role="alert" class="feedback"></div>
+        <div id="accuracyLabel">aktuální poloha:</div>
         <div id="accuracyText" aria-live="polite">sample accuracy text</div>
-        <div id="ui2_alert" role="alert" class="feedback"></div>
-        <button id="buttonStart" onclick="search1.startNavigation()" class="btn btn-primary">Spustit Navigaci</button>
-        <button id="buttonBackToFirst" onclick="search1.goFirst()" class="btn btn-default">Opravit</button>
+        <button id="buttonStart" onclick="search1.startNavigation()" class="btn btn-primary">Naviguj</button>
+        <button id="buttonBackToFirst" onclick="search1.goFirst()" class="btn btn-default">Změnit cíl</button>
     </div>
 
 {% endblock %}
@@ -51,7 +52,7 @@
         var voice1 = null;
         jQuery(document).ready(function () {
             hideVoiceIfNotSupported("voiceInputButton");
-            search1 = new Search("InputTargetAddress", "ui1_alert", "ui2_alert", "submitTargetAddress", "buttonBackToFirst",
+            search1 = new Search("InputTargetAddress", "ui1_alert", "ui2_alert", "ui2_alert2", "submitTargetAddress", "buttonBackToFirst",
                 "buttonStart", "accuracyText", "ui-1", "ui-2", "inputLabel", "accuracyLabel");
             voice1 = new VoiceRecognition("voiceInputButton", "InputTargetAddress", search1.goSecond);
         });
@@ -74,23 +75,24 @@
     </script>
 
     <script>
-        function Search(text_id, alert1_id, alert2_id, goSecond_id, goFirst_id, goStart_id, gpsStatus_id, firstPart_id,
+        function Search(text_id, alert1_id, alert2_id, alert2_2_id, goSecond_id, goFirst_id, goStart_id, gpsStatus_id, firstPart_id,
                         secondPart_id, focuspoint1, focuspoint2) {
 
             var self = this;
 
             // define class properties
             this.$text = $('#' + text_id);   // the jQuery object pointer to the text box
-            this.$gosecond = $('#' + goSecond_id); // the jQuery object pointer to the check guess button
-            this.$gofirst = $('#' + goFirst_id); // the jQuery object pointer to the check guess button
-            this.$alert1 = $('#' + alert1_id); // the jQuery object pointer to the alert area
-            this.$alert2 = $('#' + alert2_id); // the jQuery object pointer to the alert area
-            this.$firstPart = $('#' + firstPart_id); // the jQuery object pointer to the alert area
-            this.$secondPart = $('#' + secondPart_id); // the jQuery object pointer to the alert area
-            this.$start = $('#' + goStart_id); // the jQuery object pointer to the alert area
-            this.$gpsStatus = $('#' + gpsStatus_id); // the jQuery object pointer to the alert area
-            this.$focuspoint1 = $('#' + focuspoint2); // the jQuery object pointer to the alert area
-            this.$focuspoint2 = $('#' + focuspoint1); // the jQuery object pointer to the alert area
+            this.$gosecond = $('#' + goSecond_id);
+            this.$gofirst = $('#' + goFirst_id);
+            this.$alert1 = $('#' + alert1_id);
+            this.$alert2 = $('#' + alert2_id);
+            this.$alert3 = $('#' + alert2_2_id);
+            this.$firstPart = $('#' + firstPart_id);
+            this.$secondPart = $('#' + secondPart_id);
+            this.$start = $('#' + goStart_id);
+            this.$gpsStatus = $('#' + gpsStatus_id);
+            this.$focuspoint1 = $('#' + focuspoint2);
+            this.$focuspoint2 = $('#' + focuspoint1);
 
             this.firstPart = true;
 
@@ -103,7 +105,9 @@
                 self.firstPart = true;
                 self.$alert1.hide();
                 self.$alert2.hide();
+                self.$alert3.hide();
                 self.drawGui();
+                self.$text.focus();
 
             }
 
@@ -126,26 +130,28 @@
                     self.firstPart = false;
                     self.drawGui();
                     var val = self.$text.val();
-                    self.$start.html("Spustit navigaci na " + val);
+                    self.$start.html("Naviguj na " + val);
                 });
             }
 
             this.goFirst = function () {
-                this.firstPart = true;
-                this.drawGui();
+                self.firstPart = true;
+                self.drawGui();
+                self.$text.focus();
+
             }
 
             this.handleInvalidAddress = function (message) {
-                this.$text.attr('aria-invalid', 'true');
-                this.$alert1.html(message);
-                this.$alert1.show();
+                self.$text.attr('aria-invalid', 'true');
+                self.$alert1.html(message);
+                self.$alert1.show();
             }
 
             this.validateInputField = function (success) {
-                var val = this.$text.val();
+                var val = self.$text.val();
                 //check if empty
                 if (val == '') {
-                    this.handleInvalidAddress('Zapomněl jsi vyplnit kam to bude.');
+                    self.handleInvalidAddress('Zapomněl jsi vyplnit kam jdeš.');
 
                     return false;
                 } else
@@ -183,43 +189,47 @@
             }
 
             this.startNavigation = function () {
-                var targetAddress = this.$text.val();
-                if (this.validateGps()) {
+                var targetAddress = self.$text.val();
+                if (self.validateGps()) {
                     getAddress(coords.Latitude, coords.Longitude, function (sourceAddress) {
                         if (inNaviterierDB(sourceAddress)) {
                             redirectToNavigation(sourceAddress, targetAddress, "{{ request.url }}");
                         } else {
-                            this.$alert2.html('Nejsi v oblasti pokryté naviterierem. Přesuň se víc do centra Prahy.')
+                            self.$alert2.html('Nejsi v oblasti pokryté naviterierem. Přesuň se víc do centra Prahy.');
+                            self.$alert2.show();
+                            self.$alert3.html('Aktuálně jsi na ' + '\'' + sourceAddress + ' \'');
+                            self.$alert3.show();
                         }
                     }.bind(this));
                 }
             }
 
             this.validateGps = function () {
-                if (this.coords == null) {
-                    this.$alert1.html('gps nevrací žádnou pozici');
+                if (self.coords == null) {
+                    self.$alert1.html('gps nevrací žádnou pozici');
                     return false;
                 }
                 return true;
             }
 
             this.showGpsStatus = function (newValue) {
-                this.prevAccuracy = this.shownAccuracy;
-                this.shownAccuracy = Math.round(newValue);
+                self.prevAccuracy = self.shownAccuracy;
+                self.shownAccuracy = Math.round(newValue);
                 // when accuracy changes for at least 10m
-                if (Math.abs(this.prevAccuracy - this.shownAccuracy) >= 5) {
-                    this.$gpsStatus.html("+-" + this.shownAccuracy + "m. ");
+                if (Math.abs(self.prevAccuracy - self.shownAccuracy) >= 5) {
+                    self.$gpsStatus.html("+-" + self.shownAccuracy + "m. ");
                 }
             }
 
             this.updateGpsGeolocation = function (coords) {
-                this.coords = coords;
-                this.showGpsStatus(this.coords.Accuracy);
+                self.coords = coords;
+                self.showGpsStatus(self.coords.Accuracy);
             }
 
             // initialize the new search
             this.newSearch();
             this.gps = new Gps(gpsStatus_id, this.updateGpsGeolocation.bind(this))
+
         }
 
     </script>
