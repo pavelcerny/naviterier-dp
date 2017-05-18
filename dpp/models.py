@@ -61,7 +61,7 @@ class Stop(models.Model):
     stop_lon = models.FloatField()
     location_type = models.IntegerField()
     # parent_station = models.ForeignKey('self', on_delete=models.CASCADE, null=True)
-    parent_station = models.models.CharField(max_length=30)
+    parent_station = models.CharField(max_length=30)
     wheelchair_boarding = models.IntegerField
 
 
