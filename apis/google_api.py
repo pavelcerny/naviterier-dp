@@ -22,7 +22,8 @@ def getAddress(lat, lon):
     street = first[2]['long_name']
     number =  first[0]['long_name']
     premise =  first[1]['long_name']
-    address = '{} {}/{}'.format(street, premise, number)
+    # address = '{} {}/{}'.format(street, premise, number)
+    address = '{} {}'.format(street, number)
 
     return address
 
