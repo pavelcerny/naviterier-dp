@@ -53,8 +53,7 @@
                 type: "GET",
                 url: url,
                 data: get_data,
-                success: function (json) {
-                    var object = JSON.parse(json);
+                success: function (object) {
                     gpsCoordinatesHandler(object.lat, object.lon);
                     var details = getMapDetails(object.lat, object.lon, radius);
                     var groups = getSidewalksDetails(object.lat, object.lon, radius);
@@ -457,9 +456,8 @@
                 type: "POST",
                 url: url,
                 data: JSON.stringify(post_data),
-                success: function (json) {
-                    var object = JSON.parse(json);
-                    success_handler(object);
+                success: function (json_obj) {
+                    success_handler(json_obj);
                 },
             });
 
