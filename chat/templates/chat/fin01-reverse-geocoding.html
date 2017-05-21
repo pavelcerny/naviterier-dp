@@ -137,6 +137,10 @@
                 self.firstPart = true;
                 self.drawGui();
                 self.$focuspoint1.focus();
+                self.$alert2.html('');
+                self.$alert3.html('');
+                self.$alert2.hide();
+                self.$alert3.hide();
 
             }
 
@@ -156,7 +160,6 @@
                 } else
                 //check if in db
                     inNaviterierDB(val, function (inNaviterier) {
-                        inNaviterier = JSON.parse(inNaviterier);
                         if (inNaviterier.streetAndHouseNumber) {
                             //cool
                         } else if (inNaviterier.streetAndLandRegistryNumber) {
@@ -165,13 +168,13 @@
                             // wrong number
                             if (inNaviterier.street) {
                                 // just wrong number
-                                self.handleInvalidAddress('Číslo ' + '\'' + inNaviterier.input.number + '\' není v naší databázi' +
-                                    ' adres, zkus zadat adresu s jiným číslem.');
+                                self.handleInvalidAddress('Číslo ' + '\'' + inNaviterier.input.number + '\' není v databázi' +
+                                    ', zkus zadat ulici ' + '\'' + inNaviterier.input.street + '\' s jiným číslem.');
 
                                 return false;
                             } else {
                                 // wrong street
-                                self.handleInvalidAddress('Ulice ' + '\'' + inNaviterier.input.street + '\' není v naší databázi' +
+                                self.handleInvalidAddress('Ulice ' + '\'' + inNaviterier.input.street + '\' není v databázi' +
                                     ' adres, zkontroluj jestli nemáš překlep, nebo zkus jinou ulici.');
 
                                 return false;
@@ -191,15 +194,35 @@
                 var targetAddress = self.$text.val();
                 if (self.validateGps()) {
                     getAddress(coords.Latitude, coords.Longitude, function (sourceAddress) {
-                        if (inNaviterierDB(sourceAddress)) {
+                        inNaviterierDB(sourceAddress, function (inNaviterierResponse) {
+                            if (inNaviterierResponse.streetAndHouseNumber) {
+                                //cool
+                            } else if (inNaviterierResponse.streetAndLandRegistryNumber) {
+                                //cool
+                            } else {
+                                // wrong number
+                                if (inNaviterierResponse.street) {
+                                    // just wrong number
+                                    self.$alert2.html('Nejsi v oblasti pokryté naviterierem. Přesuň se víc do centra Prahy.');
+                                    self.$alert2.show();
+                                    self.$alert3.html('Aktuálně jsi na ' + '\'' + sourceAddress + ' \'');
+                                    self.$alert3.show();
+                                    return false;
+                                } else {
+                                    // wrong street
+                                    self.$alert2.html('Nejsi v oblasti pokryté naviterierem. Přesuň se víc do centra Prahy.');
+                                    self.$alert2.show();
+                                    self.$alert3.html('Aktuálně jsi na ' + '\'' + sourceAddress + ' \'');
+                                    self.$alert3.show();
+                                    return false;
+                                }
+                            }
+
                             redirectToNavigation(sourceAddress, targetAddress, "{{ request.url }}");
-                        } else {
-                            self.$alert2.html('Nejsi v oblasti pokryté naviterierem. Přesuň se víc do centra Prahy.');
-                            self.$alert2.show();
-                            self.$alert3.html('Aktuálně jsi na ' + '\'' + sourceAddress + ' \'');
-                            self.$alert3.show();
-                        }
-                    }.bind(this));
+                        });
+
+
+                    })
                 }
             }
 

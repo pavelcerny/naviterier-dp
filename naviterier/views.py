@@ -48,7 +48,7 @@ def isAddressInDbAPI(request):
     else:
         number = words[-1]
     response = json.dumps(isAddressInDB(street,number))
-    return HttpResponse(response)
+    return HttpResponse(response, content_type='application/json')
 
 
 
@@ -66,12 +66,12 @@ def isAddressInDB(street, house_number):
     """
     street_noaccents = simplify(street)
 
-    house_number_noaccents = simplifyNumber(house_number)
+    house_number_simplified = simplifyHouseNumber(house_number)
 
     count_house_number = Address.objects.filter(street_noaccents=street_noaccents,
-                                                houseNumber=house_number_noaccents).count()
+                                                houseNumber=house_number_simplified).count()
     count_landRegistryNumber = Address.objects.filter(street_noaccents=street_noaccents,
-                                                      landRegistryNumber=house_number_noaccents).count()
+                                                      landRegistryNumber=house_number_simplified).count()
 
     if count_house_number > 0 or count_landRegistryNumber > 0:
         count_street = 1;
@@ -84,7 +84,7 @@ def isAddressInDB(street, house_number):
         "streetAndLandRegistryNumber": True if count_landRegistryNumber > 0 else False,
         "input" : {
             "street":street,
-            "number":house_number_noaccents,
+            "number":house_number_simplified,
         }
     }
 
@@ -99,9 +99,9 @@ def simplify(text):
     return only_letters
 
 
-def simplifyNumber(house_number):
-    if "/" in house_number:
-        landRegistry, house = house_number.split("/",1)
-        return house
+def simplifyHouseNumber(number):
+    if "/" in number:
+        landRegistryNumber, houseNumber = number.split("/", 1)
+        return houseNumber
     else:
-        return house_number
+        return number

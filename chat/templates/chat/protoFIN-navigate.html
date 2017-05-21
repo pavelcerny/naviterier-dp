@@ -107,6 +107,11 @@
             if (previousUrl == ""){
                 $("#divButtonBackToSetup").hide();
             }
+
+            if (typeof message == 'undefined') {
+                message = 'Neumíme navigovat z tvé polohy do tvého cíle. Zkuste jít jinam víc po centru Prahy';
+                $("#divButtonStartJourney").hide();
+            }
             displayMessage(message)
         }
 
