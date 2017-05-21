@@ -36,6 +36,7 @@ INSTALLED_APPS = [
     'chat.apps.ChatConfig',
     'apis.apps.ApisConfig',
     'naviterier.apps.NaviterierConfig',
+    'user_testing.apps.UserTestingConfig',
     'dpp.apps.DppConfig',
     'django.contrib.admin',
     'django.contrib.auth',

@@ -71,13 +71,12 @@
             });
         }
 
-        function getAddressOnSidewalk(lat,lon, callback) {
-
-        // get address from coordinates
+        function getAddressOnSidewalk(lat, lon, callback) {
+            // get address from coordinates
             var url = "{% url "gpsLocalization:getAddressForProjectionApi" %}";
             var post_data = {
-                "lat":lat,
-                "lon":lon,
+                "lat": lat,
+                "lon": lon,
             }
 
             $.ajax({
@@ -89,5 +88,30 @@
                 },
             });
         }
+
+
+        function logExperiment(lat, lon, estAddress, targetAddress, experimentType, userPath, callback) {
+            var post_data = {
+                lat: lat,
+                lon: lon,
+                experimentType: experimentType,
+                estimatedAddress: estAddress,
+                targetAddress: targetAddress,
+                userPath: userPath,
+                contentType: "application/json; charset=utf-8",
+            }
+
+            $.ajax({
+                type: "POST",
+                url: "{% url "usertesting:logexperiment" %}",
+                data: JSON.stringify(post_data),
+                contentType: "application/json",
+                success: function (response) {
+                    callback(response);
+                },
+            });
+        }
+
+
     </script>
 {% endblock %}

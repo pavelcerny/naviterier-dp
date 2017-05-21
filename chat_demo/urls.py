@@ -25,6 +25,7 @@ urlpatterns = [
     url(r'^apis/', include('apis.urls', namespace="apis")),
     url(r'^naviterier/', include('naviterier.urls', namespace="naviterier")),
     url(r'^dpp/', include('dpp.urls', namespace="dpp")),
+    url(r'^log/', include('user_testing.urls', namespace="usertesting")),
     url(r'^admin/', admin.site.urls),
 
 ]

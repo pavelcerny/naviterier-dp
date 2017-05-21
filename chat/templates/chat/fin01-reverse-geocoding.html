@@ -225,6 +225,7 @@
                                 }
                             }
 
+                            logExperiment(coords.Latitude, coords.Longitude, sourceAddress, targetAddress, {{ type }}, {}, function(){});
                             redirectToNavigation(sourceAddress, targetAddress, "{{ request.url }}");
                         });
 
