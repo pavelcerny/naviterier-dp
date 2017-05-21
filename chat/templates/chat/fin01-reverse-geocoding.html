@@ -168,8 +168,15 @@
                             // wrong number
                             if (inNaviterier.street) {
                                 // just wrong number
-                                self.handleInvalidAddress('Číslo ' + '\'' + inNaviterier.input.number + '\' není v databázi' +
+                                if (inNaviterier.input.number == 'nevyplněné'){
+                                    // no number entered
+                                    self.handleInvalidAddress('Nezadal jsi číslo popisné' +
+                                    ', zkus zadat ulici ' + '\'' + inNaviterier.input.street + '\' s nějakým číslem.');
+                                } else {
+                                    // wrong number entered
+                                    self.handleInvalidAddress('Číslo ' + '\'' + inNaviterier.input.number + '\' není v databázi' +
                                     ', zkus zadat ulici ' + '\'' + inNaviterier.input.street + '\' s jiným číslem.');
+                                }
 
                                 return false;
                             } else {
@@ -239,7 +246,7 @@
                 self.shownAccuracy = Math.round(newValue);
                 // when accuracy changes for at least 10m
                 if (Math.abs(self.prevAccuracy - self.shownAccuracy) >= 5) {
-                    self.$gpsStatus.html("+-" + self.shownAccuracy + "m. ");
+                    self.$gpsStatus.html("přesnost " + self.shownAccuracy + "m. ");
                 }
             }
 

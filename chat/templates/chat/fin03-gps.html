@@ -253,7 +253,6 @@
                 } else
                 //check if in db
                     inNaviterierDB(val, function (inNaviterier) {
-                        inNaviterier = JSON.parse(inNaviterier);
                         if (inNaviterier.streetAndHouseNumber) {
                             //cool
                         } else if (inNaviterier.streetAndLandRegistryNumber) {
@@ -262,8 +261,15 @@
                             // wrong number
                             if (inNaviterier.street) {
                                 // just wrong number
-                                self.handleInvalidAddress('Číslo ' + '\'' + inNaviterier.input.number + '\' není v naší databázi' +
-                                    ' adres, zkus zadat ' + '\'' + inNaviterier.input.street + '\' s jiným číslem');
+                                if (inNaviterier.input.number == 'nevyplněné') {
+                                    // no number entered
+                                    self.handleInvalidAddress('Nezadal jsi číslo popisné' +
+                                        ', zkus zadat ulici ' + '\'' + inNaviterier.input.street + '\' s nějakým číslem.');
+                                } else {
+                                    // wrong number entered
+                                    self.handleInvalidAddress('Číslo ' + '\'' + inNaviterier.input.number + '\' není v naší databázi' +
+                                        ' adres, zkus zadat ' + '\'' + inNaviterier.input.street + '\' s jiným číslem');
+                                }
 
                                 return false;
                             } else {
