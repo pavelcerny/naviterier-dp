@@ -3,7 +3,7 @@ import json
 from django.http import HttpResponse
 from django.views.decorators.csrf import csrf_exempt
 
-from apis import google_api, naviterier_api
+from apis import google_api, naviterier_api, here_api
 from apis.naviterier_api import findRoutes, getItinerary
 from apis.watson_api import conversation, WORKSPACE_ID
 
@@ -59,7 +59,8 @@ def getAddressFromGpsAPI(request):
     lat = request.GET['lat']
     lon = request.GET['lon']
 
-    address = google_api.getAddress(lat, lon)
+    # address = google_api.getAddress(lat, lon)
+    address = here_api.getAddress(lat, lon)
 
     # to String
     return HttpResponse(address)
