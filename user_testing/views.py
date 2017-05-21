@@ -8,6 +8,7 @@ from django.shortcuts import render
 from django.views.decorators.csrf import csrf_exempt
 
 from gpsLocalization.views import _getUserPathFromLocateMeData
+from naviterier.views import gpsForEntryforAddress
 from user_testing.models import Experiment, ExperimentType
 
 
@@ -38,6 +39,8 @@ def logExperiment(request):
     if 'userPath' in data:
         userPath = data['userPath']
 
+    entry_coords = gpsForEntryforAddress(estimatedAddress)
+
 
     e = Experiment()
     e.type = experimentType
@@ -45,8 +48,8 @@ def logExperiment(request):
     e.realGpsLon = 0
     e.estimatedGpsLat = lat
     e.estimatedGpsLon = lon
-    e.estimatedAddressLat = 0
-    e.estimatedAddressLon = 0
+    e.estimatedAddressLat = entry_coords["lat"]
+    e.estimatedAddressLon = entry_coords["lon"]
     e.estimatedAddress = estimatedAddress
     e.targetAddress = targetAddress
     e.recordTime = datetime.datetime.now()

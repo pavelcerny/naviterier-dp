@@ -9,4 +9,5 @@ urlpatterns = [
     # API
     # url(r'^update$', views.updateAddressesDbAPI, name='updateAdresses'),
     url(r'^isaddressindb$', views.isAddressInDbAPI, name='isAddressInDb'),
+    url(r'^gpsForEntryforAddress$', views.gpsForEntryforAddressAPI, name='gpsForEntryforAddress'),
 ]

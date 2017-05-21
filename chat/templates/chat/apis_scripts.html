@@ -112,6 +112,14 @@
             });
         }
 
+        function getEntryGPS(address, callback) {
+            // get gps fromAddress
+            $.get(
+                "{% url 'naviterier:gpsForEntryforAddress' %}",
+                {'address': address},
+                callback);
+        }
+
 
     </script>
 {% endblock %}

@@ -13,8 +13,8 @@ def reverseGeocodingFinal(request):
 
 def poiFinal(request):
     context = {
-        'type-address': ExperimentType.POI_ADDRESS,
-        'type-mhd': ExperimentType.POI_MHD,
+        'typeAddress': ExperimentType.POI_ADDRESS,
+        'typeMhd': ExperimentType.POI_MHD,
     }
     return render(request, 'chat/fin02-poi-chat.html', context=context)
 

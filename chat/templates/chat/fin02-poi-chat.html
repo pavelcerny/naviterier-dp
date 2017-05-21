@@ -80,6 +80,8 @@
             this.methodMhd = false;
 
             this.navigationDetails = null;
+            this.lat;
+            this.lon;
 
             this.alert = function (alert_text) {
                 self.$alert.html(alert_text);
@@ -199,10 +201,20 @@
                     var stop = self.navigationDetails["StartStopName"];
 
 
-                    getAddressFromTriple(stop, direction, line, callback)
+                    //getAddressFromTriple(stop, direction, line, callback);
+                    getGpsFromTriple(stop, direction, line, function (data) {
+                        self.lat = data.lat;
+                        self.lon = data.lon;
+                        getAddress(data.lat, data.lon, callback);
+                    });
+
                 } else {
                     var sourceAddress = self.navigationDetails["StartStreet"] + " " + self.navigationDetails["StartLandregistryNumber"];
-                    callback(sourceAddress)
+                    getEntryGPS(sourceAddress, function (entryCoords) {
+                        self.lat = entryCoords.lat;
+                        self.lon = entryCoords.lon;
+                    });
+                    callback(sourceAddress);
                 }
             }
 
@@ -248,12 +260,27 @@
                                 self.validateInNaviterier(inNaviterier, function () {
 
                                     //everything ok
+
+                                    logExperiment(self.lat, self.lon, sourceAddress, targetAddress, self.setTypeForLoging(), {}, function () {
+                                    });
                                     redirectToNavigation(sourceAddress, targetAddress, "{{ request.url }}");
                                 })
                             })
                         })
                     })
                 });
+            }
+
+            this.setTypeForLoging = function () {
+                var type;
+                if (self.methodMhd) {
+                    type =
+                    {{ typeMhd }}
+                } else {
+                    type =
+                    {{ typeAddress }}
+                }
+                return type;
             }
 
             this.textWatson(this.drawGui);
