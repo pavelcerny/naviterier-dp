@@ -239,14 +239,12 @@
                 var targetAddress = self.navigationDetails["TargetStreet"] + " " + self.navigationDetails["TargetLandregistryNumber"];
                 self.getSourceAddress(function (sourceAddress) {
 
-                    inNaviterierDB(sourceAddress, function (response) {
+                    inNaviterierDB(sourceAddress, function (inNaviterier) {
                         // if source address is in DB
-                        var inNaviterier = JSON.parse(response)
                         self.validateInNaviterier(inNaviterier, function () {
 
-                            inNaviterierDB(targetAddress, function (response) {
+                            inNaviterierDB(targetAddress, function (inNaviterier) {
                                 //if target address is in DB
-                                var inNaviterier = JSON.parse(response);
                                 self.validateInNaviterier(inNaviterier, function () {
 
                                     //everything ok
