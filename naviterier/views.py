@@ -29,6 +29,7 @@ def updateAddressesDbAPI(request):
         aToStore.landRegistryNumber = a["LandRegistryNumber"]
         aToStore.city = a["City"]
 
+        shape.save()
         aToStore.save()
 
     return HttpResponse("addresses updated")
