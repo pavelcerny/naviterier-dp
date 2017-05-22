@@ -356,8 +356,9 @@
                     gpsFromUserPath(self.userPath, function (response) {
                         var myPosition = response.userCoordinates;
                         getAddressOnSidewalk(myPosition.lat, myPosition.lon, function (sourceAddress) {
-                            logExperiment(myPosition.lat, myPosition.lon, sourceAddress, targetAddress, {{ type }}, self.userPath, function () {});
-                            redirectToNavigation(sourceAddress, targetAddress, "{{ request.url }}");
+                            logExperiment(myPosition.lat, myPosition.lon, sourceAddress, targetAddress, {{ type }}, self.userPath, function () {
+                                redirectToNavigation(sourceAddress, targetAddress, "{{ request.url }}");
+                            });
                         });
                     })
 
