@@ -32,6 +32,7 @@ class Experiment(models.Model):
 class GpsCoords(models.Model):
     lat = models.FloatField(default=0)
     lon = models.FloatField(default=0)
+    experiment = Experiment
 
     class Meta:
         abstract = True

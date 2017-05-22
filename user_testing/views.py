@@ -9,7 +9,7 @@ from django.views.decorators.csrf import csrf_exempt
 
 from gpsLocalization.views import _getUserPathFromLocateMeData
 from naviterier.views import gpsForEntryforAddress
-from user_testing.models import Experiment, ExperimentType
+from user_testing.models import Experiment, ExperimentType, RecordedBeforeCorner, RecordedAfterCorner
 
 
 @csrf_exempt
@@ -24,7 +24,7 @@ def logExperiment(request):
     # unpack
     json_str = request.body
     data = json.loads(json_str)
-    #userPath = _getUserPathFromLocateMeData(data)
+    # userPath = _getUserPathFromLocateMeData(data)
 
     if 'lat' in data:
         lat = data['lat']
@@ -40,7 +40,6 @@ def logExperiment(request):
         userPath = data['userPath']
 
     entry_coords = gpsForEntryforAddress(estimatedAddress)
-
 
     e = Experiment()
     e.type = experimentType
