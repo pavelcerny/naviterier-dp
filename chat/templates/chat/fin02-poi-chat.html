@@ -262,8 +262,8 @@
                                     //everything ok
 
                                     logExperiment(self.lat, self.lon, sourceAddress, targetAddress, self.setTypeForLoging(), {}, function () {
+                                        redirectToNavigation(sourceAddress, targetAddress, "{{ request.url }}");
                                     });
-                                    redirectToNavigation(sourceAddress, targetAddress, "{{ request.url }}");
                                 })
                             })
                         })
