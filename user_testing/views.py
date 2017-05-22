@@ -56,6 +56,18 @@ def logExperiment(request):
     e.fromMyTesting = False
     e.save()
 
+    if userPath != {}:
+        for u in userPath["beforeCorner"]:
+            b = RecordedBeforeCorner()
+            b.lat = u["lat"]
+            b.lon = u["lon"]
+            b.save()
+        for u in userPath["afterCorner"]:
+            a = RecordedAfterCorner()
+            a.lat = u["lat"]
+            a.lon = u["lon"]
+            a.save()
+
     # todo save user path
 
     return HttpResponse('ok')
