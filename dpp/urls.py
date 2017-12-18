@@ -8,6 +8,6 @@ urlpatterns = [
 
     # API
     # url(r'^update$', views.update, name='update'),
-    url(r'^find$', views.find, name='find'),
+    url(r'^find$', views.gpsFromTripleAPI, name='find'),
 
 ]

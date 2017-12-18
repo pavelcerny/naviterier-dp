@@ -22,7 +22,7 @@ def update(request):
     return HttpResponse("load ok")
 
 
-def find(request):
+def gpsFromTripleAPI(request):
     startStopName = "Slavia"
     startStopDirection = "Strašnická"
     startLineNumber = "7"
@@ -34,13 +34,13 @@ def find(request):
     if ('startLineNumber' in request.POST):
         startLineNumber = request.POST['startLineNumber']
 
-    response = findFromTriple(startStopName,startStopDirection,startLineNumber)
+    response = gpsFromTriple(startStopName, startStopDirection, startLineNumber)
 
     return HttpResponse(json.dumps(response), {'content-type':'application/json'})
 
 
 
-def findFromTriple(startStopName,startStopDirection,startLineNumber):
+def gpsFromTriple(startStopName, startStopDirection, startLineNumber):
     # find tram line details
     route = Route.objects.get(route_short_name=startLineNumber)
     # find all trips with given line, get all their head signs
