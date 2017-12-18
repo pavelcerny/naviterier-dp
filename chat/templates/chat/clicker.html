@@ -43,7 +43,7 @@
         function getGpsCoords() {
             var address = document.getElementById("inputAddress").value;
             var radius = document.getElementById("inputRadius").value;
-            var url = "{% url 'chat:google_geo' %}";
+            var url = "{% url 'apis:gpsFromAddress'  %}";
 
             var get_data = {
                 address: address,
