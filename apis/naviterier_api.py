@@ -2,8 +2,6 @@ import json
 
 import requests
 
-# NAVITERIER_SERVER = "http://147.32.81.71/NaviTerier.ProcessingService"
-# NAVITERIER_URL = NAVITERIER_SERVER + "/json/reply"
 NAVITERIER_SERVER = "http://147.32.81.71/NaviTerier.ProcessingService"
 NAVITERIER_URL = NAVITERIER_SERVER + "/json/reply"
 

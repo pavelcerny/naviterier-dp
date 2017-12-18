@@ -3,10 +3,9 @@ import json
 import requests
 
 GOOGLE_API_KEY = "AIzaSyC7WCaTEPswl2Cs77ncqxiz7O4fLK2z2Wk"
-
+URL = "https://maps.googleapis.com/maps/api/geocode/json"
 
 def getAddress(lat, lon):
-    URL = "https://maps.googleapis.com/maps/api/geocode/json"
     # request google API
     payload = {'latlng': str(lat) + "," + str(lon),  # 50.094265,
                'key': GOOGLE_API_KEY}
@@ -29,7 +28,6 @@ def getAddress(lat, lon):
 
 
 def getGps(address):
-    URL = "https://maps.googleapis.com/maps/api/geocode/json"
     # request google API
     payload = {'address': address}
     url = URL

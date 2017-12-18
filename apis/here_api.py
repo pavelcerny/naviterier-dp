@@ -6,10 +6,10 @@ from naviterier.views import simplifyHouseNumber
 
 HERE_APP_ID = 'JuqrHIoriI7bnBIrWekn'
 HERE_APP_CODE = 'YYFjqdWAc-CRWioPKT6Hog'
+URL = "https://reverse.geocoder.cit.api.here.com/6.2/reversegeocode.json"
 
 
 def getAddress(lat, lon):
-    URL = "https://reverse.geocoder.cit.api.here.com/6.2/reversegeocode.json"
     # request here API
     payload = {
         "prox": str(lat) + ',' + str(lon) + ',' + '100',
