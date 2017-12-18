@@ -9,34 +9,27 @@ from apis.watson_api import conversation, WORKSPACE_ID
 
 
 @csrf_exempt
-def getAddressesAPI(request):
-        # unpack
-        lat = request.GET['lat']
-        lon = request.GET['lon']
+def getAddressesInNaviterierAPI(request):
+    """
+    Returns JSON with all addresses stored at the Naviterier server
 
-        # do
-        response = naviterier_api.getAddresses(lat, lon)
+    :returns
+    {"Addresses": [ {"Id": "40825124",
+                    "Shape": {"Latitude": 50.0887841946588, "Longitude": 14.4442259626852},
+                    "Street": "Pernerova",
+                    "HouseNumber": "2b",
+                    "LandRegistryNumber": "2870",
+                    "City": "Praha"},
+                    {...},
+                    {...}
+    ]}
+    """
 
-        # pack response
-        response_json = json.dumps(response)
-        return HttpResponse(response_json, content_type="application/json")
+    response = naviterier_api.getAddresses()
 
-
-def _getFirstItinerary(response):
-    error = False
-    message = ""
-
-    if "TargetAddress" not in response:
-        if "SourceAddress" not in response:
-            return "Both Start & Target address is wrongly written. Double check it's correct"
-        else:
-            return "Target address is wrongly written. Double check it's correct"
-    if "SourceAddress" not in response:
-        return "Source address is wrongly written. Double check it's correct"
-
-    itinerary = response["Routes"][0]["Itinerary"]
-    return itinerary
-
+    # pack response
+    response_json = json.dumps(response)
+    return HttpResponse(response_json, content_type="application/json")
 
 
 @csrf_exempt

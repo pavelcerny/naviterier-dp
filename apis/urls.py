@@ -9,7 +9,7 @@ urlpatterns = [
     # API
     # naviterier
     url(r'^demo$', views.demo, name='demo'),
-    url(r'^addresses$', views.getAddressesAPI, name='getaddressesapi'),
+    url(r'^addresses$', views.getAddressesInNaviterierAPI, name='getaddressesapi'),
     url(r'^routes$', views.findRoutesAPI, name='findroutesapi'),
     url(r'^tracing$', views.getNavigationItineraryFromAddressToAddress, name='getTracing'),
     # google
