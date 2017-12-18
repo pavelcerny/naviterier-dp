@@ -17,8 +17,9 @@ def getAddressesAPI(request):
         # do
         response = naviterier_api.getAddresses(lat, lon)
 
-        # pack
-        return HttpResponse(json.dumps(response), content_type="application/json")
+        # pack response
+        response_json = json.dumps(response)
+        return HttpResponse(response_json, content_type="application/json")
 
 
 def _getFirstItinerary(response):
@@ -49,8 +50,10 @@ def findRoutesAPI(request):
     
     response = _getFirstItinerary(response)
 
-    # pack
-    return HttpResponse(json.dumps(response), content_type="application/json")
+
+    # pack response
+    response_json = json.dumps(response)
+    return HttpResponse(response_json, content_type="application/json")
 
 
 @csrf_exempt
@@ -62,7 +65,7 @@ def getAddressFromGpsAPI(request):
     # address = google_api.getAddress(lat, lon)
     address = here_api.getAddress(lat, lon)
 
-    # to String
+    # response
     return HttpResponse(address)
 
 
@@ -75,7 +78,7 @@ def getGpsFromAddressAPI(request):
     # do
     location = google_api.getGps(address)
 
-    # pack
+    # pack response
     response_json = json.dumps(location)
     return HttpResponse(response_json, content_type="application/json")
 
@@ -88,8 +91,9 @@ def getNavigationItineraryFromAddressToAddress(request):
     # do
     response = getItinerary(sourceAddress, tartgetAddress)
 
-    # pack
-    return HttpResponse(json.dumps(response), content_type="application/json")
+    # pack response
+    response_json = json.dumps(response)
+    return HttpResponse(response_json, content_type="application/json")
 
 
 def getNavigationItineraryFromSegmentIdToAddress(request):
@@ -100,8 +104,9 @@ def getNavigationItineraryFromSegmentIdToAddress(request):
     # do
     response = getItinerary(sourceAddress, tartgetAddress)
 
-    # pack
-    return HttpResponse(json.dumps(response), content_type="application/json")
+    # pack response
+    response_json = json.dumps(response)
+    return HttpResponse(response_json, content_type="application/json")
 
 
 @csrf_exempt
@@ -123,9 +128,10 @@ def watsonResponse(request):
         context=context
     )
 
-    text = json.dumps(response)
+    # pack response
     request.session['context'] = response['context']
-    return HttpResponse(text, content_type="application/json")
+    response_json = json.dumps(response)
+    return HttpResponse(response_json, content_type="application/json")
 
 
 @csrf_exempt
@@ -137,5 +143,7 @@ def demo(request):
     # do
     response = getItinerary(sourceAddress, tartgetAddress)
 
-    # pack
-    return HttpResponse(json.dumps(response), content_type="application/json")
+    # pack response
+    response_json = json.dumps(response)
+    return HttpResponse(response_json, content_type="application/json")
+
