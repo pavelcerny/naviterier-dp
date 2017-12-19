@@ -36,23 +36,23 @@ def index_html(request):
 
 
 def navigateCurrentNaviterier(request):
-    return render(request, 'chat/naviterierCurrent.html', {})
+    return render(request, 'chat/fin00-naviterierSotA.html', {})
 
 
 def chat_with_history(request):
-    return render(request, 'chat/whistory.html', {})
+    return render(request, 'chat/tmp_whistory.html', {})
 
 
 def speechrecognition(request):
-    return render(request, 'chat/speechrecognition.html', {})
+    return render(request, 'chat/tmp_speechrecognition.html', {})
 
 
 def speechrecognition02(request):
-    return render(request, 'chat/speechrecognition02.html', {})
+    return render(request, 'chat/tmp_speechrecognition02.html', {})
 
 
 def reverseGeocoding(request):
-    return render(request, 'chat/proto01-reverse-geocoding.html')
+    return render(request, 'chat/tmp_proto01-reverse-geocoding.html')
 
 
 def navigateExample(request):
@@ -73,26 +73,26 @@ def navigateExample(request):
         "SourceAddress": sourceAddress,
         "PreviousUrl": previousUrl
     }
-    return render(request, 'chat/protoFIN-navigate.html', context)
+    return render(request, 'chat/fin00-navigate.html', context)
 
 
 def poi(request):
     # reset session
     request.session['context'] = {}
 
-    return render(request, 'chat/proto02-poi-chat.html')
+    return render(request, 'chat/tmp_proto02-poi-chat.html')
 
 
 def gpsAndCompass(request):
-    return render(request, 'chat/proto03-gps.html')
+    return render(request, 'chat/tmp_proto03-gps.html')
 
 
 def showCompass(request):
-    return render(request, 'chat/showcompass.html')
+    return render(request, 'chat/tools_showcompass.html')
 
 
 def mapClicker(request):
-    return render(request, 'chat/clicker.html')
+    return render(request, 'chat/tools_clicker.html')
 
 
 # API
@@ -106,4 +106,4 @@ def processUserInput(request):
 
 
 def sandbox(request):
-    return render(request, 'chat/sandbox.html')
+    return render(request, 'chat/tmp_sandbox.html')
