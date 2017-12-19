@@ -7,14 +7,14 @@ from . import views
 
 urlpatterns = [
     # development
-    url(r'^reversegcdev$', views.reverseGeocoding, name='reversegeocodingDev'),
+    url(r'^reversegcdev$', views.reverseGeocoding, name='reversegcDev'),
     url(r'^poidev$', views.poi, name='poiDev'),
-    url(r'^gpsdev$', views.gpsAndCompass, name='gpsandcompassDev'),
+    url(r'^gpsdev$', views.gps, name='gpsDev'),
 
     # final prototypes
-    url(r'^reversegc$', views.reverseGeocodingFinal, name='reversegeocoding'),
+    url(r'^reversegc$', views.reverseGeocodingFinal, name='reversegc'),
     url(r'^poi$', views.poiFinal, name='poi'),
-    url(r'^gps$', views.gpsFinal, name='gpsandcompass'),
+    url(r'^gps$', views.gpsFinal, name='gps'),
 
     # tools
     url(r'^$', views.index_html, name='index'),

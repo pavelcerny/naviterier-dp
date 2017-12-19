@@ -52,7 +52,7 @@ def speechrecognition02(request):
 
 
 def reverseGeocoding(request):
-    return render(request, 'chat/tmp_proto01-reverse-geocoding.html')
+    return render(request, 'chat/dev01-reverse-geocoding.html')
 
 
 def navigateExample(request):
@@ -80,11 +80,11 @@ def poi(request):
     # reset session
     request.session['context'] = {}
 
-    return render(request, 'chat/tmp_proto02-poi-chat.html')
+    return render(request, 'chat/dev02-poi-chat.html')
 
 
-def gpsAndCompass(request):
-    return render(request, 'chat/tmp_proto03-gps.html')
+def gps(request):
+    return render(request, 'chat/dev03-gps.html')
 
 
 def showCompass(request):
