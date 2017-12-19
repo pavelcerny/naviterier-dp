@@ -28,7 +28,7 @@ def gpsFinal(request):
 
 # old methods
 def index(request):
-    return HttpResponse("Hello, world. You're at the polls index.")
+    return HttpResponse("Hello, world. You're at the Naviterier index.")
 
 
 def index_html(request):
