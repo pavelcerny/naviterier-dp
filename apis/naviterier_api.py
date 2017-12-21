@@ -71,8 +71,11 @@ def findSegments(lat, lon, radius, formOfWay ='All'):
         return segments
     elif formOfWay == "Walkable":
         sidewalks = _filterByFormOfWay(segments, "Sidewalk")
-        walkways = _filterByFormOfWay(segments, "WalkWay")
-        filtered_segments = sidewalks + walkways
+        # enter all possible FormOfWay you want to use i.e. WalkWay, Crossway, etc.:
+        # ie. walkways = _filterByFormOfWay(segments, "WalkWay")
+        # unite them:
+        # i.e. filtered_segments = sidewalks + walkways
+        filtered_segments = sidewalks
         return filtered_segments
     else:
         return _filterByFormOfWay(segments, formOfWay)
