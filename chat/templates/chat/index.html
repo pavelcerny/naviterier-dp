@@ -4,7 +4,7 @@
 
     <body>
     <div class="text-center">
-        <h2>Prototypy</h2>
+        <h1>Prototypy</h1>
        
 
         <div><a href="{% url 'chat:reversegc' %}">A - reverse geocoding</a></div>
@@ -13,18 +13,26 @@
 
         <br>
 
-        <h2>Nástroje</h2>
+        <h4>Nástroje</h4>
 
         <div><a href="{% url 'chat:showCompass' %}">show compass</a></div>
         <div><a href="{% url 'chat:clicker' %}">clicker</a></div>
 
         <br>
 
-        <h2>Původní Naviterier</h2>
+        <h4>Původní Naviterier</h4>
 
 
         <div><a href="{% url 'chat:navigateExample' %}">ukázka navigace</a></div>
         <div><a href="{% url 'chat:navigate' %}">naviguj</a></div>
+
+        <br>
+
+        <h4>DEV versions</h4>
+        <div><a href="{% url 'chat:reversegcDev' %}">A - reverse geocoding</a></div>
+        <div><a href="{% url 'chat:poiDev' %}">B - poi</a></div>
+        <div><a href="{% url 'chat:gpsDev' %}">C - gps and compass</a></div>
+
 
 
     </div>
