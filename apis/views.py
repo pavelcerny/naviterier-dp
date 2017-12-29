@@ -45,9 +45,7 @@ def findRoutesAPI(request):
     targetAddress = request.post["TargetAddress"]
 
     # do
-    response = findRoutes(sourceAddress, targetAddress)
-    
-    response = _getFirstItinerary(response)
+    response = getItinerary()
 
 
     # pack response
