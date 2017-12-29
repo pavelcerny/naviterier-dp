@@ -232,7 +232,7 @@
 <script>
     function getGpsCoordsOfTarget() {
         var address = document.getElementById("InputTargetAddress").value;
-        var url = "{% url 'chat:google_geo' %}";
+        var url = "{% url 'apis:gpsFromAddress' %}";
 
         var get_data = {
             address: address,
