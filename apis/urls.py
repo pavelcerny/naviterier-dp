@@ -11,7 +11,7 @@ urlpatterns = [
     url(r'^demo$', views.demo, name='demo'),
     url(r'^addresses$', views.getAddressesInNaviterierAPI, name='getaddressesapi'),
     url(r'^routes$', views.findRoutesAPI, name='findroutesapi'),
-    url(r'^tracing$', views.getNavigationItineraryFromAddressToAddress, name='getTracing'),
+    url(r'^itinerary$', views.getItineraryFromAddressToAddressAPI, name='getItinerary'),
     # google
     url(r'^gpsFromAddress$', views.getGpsFromAddressAPI, name='gpsFromAddress'),
     url(r'^addressFromGps$', views.getAddressFromGpsAPI, name='addressFromGps'),

@@ -88,7 +88,7 @@ def getGpsFromAddressAPI(request):
     return HttpResponse(response_json, content_type="application/json")
 
 
-def getNavigationItineraryFromAddressToAddress(request):
+def getItineraryFromAddressToAddressAPI(request):
     '''
 
     :param request:
@@ -106,7 +106,7 @@ def getNavigationItineraryFromAddressToAddress(request):
     return HttpResponse(response_json, content_type="application/json")
 
 
-def getNavigationItineraryFromSegmentIdToAddress(request):
+def getItineraryFromSegmentIdToAddressAPI(request):
     # unpack
     sourceAddress = request.GET['SourceSegmentId']
     tartgetAddress = request.GET['TargetAddress']

@@ -31,7 +31,7 @@
     <script>
         function getItinerary() {
             $.get(
-            "{% url 'apis:getTracing' %}",
+            "{% url 'apis:getItinerary' %}",
             {
                 'TargetAddress':    targetAddress,
                 'SourceAddress':    sourceAddress,
