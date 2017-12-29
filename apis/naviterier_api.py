@@ -179,9 +179,34 @@ def getItinerary(sourceAddress, targetAddress):
 
     response = findRoutes(sourceAddress, targetAddress)
     # take the first result (there can be more results)
+
+
+
     response = _getFirstItinerary(response)
+    targetRecognized = True
+    sourceRecognized = True
+
+    if "TargetAddress" not in response:
+        targetRecognized = False
+    if "SourceAddress" not in response:
+        sourceRecognized = False
+
+    sourceInDB = True
+    targetInDB = True
+
+    if not targetRecognized:
+        targetInDB = _isInDB(targetAddress)
+    if not sourceRecognized:
+        targetInDB = _isInDB(targetAddress)
+
+    #TODO return why address is not recognized
 
     return response
+
+
+def _isInDB(address):
+    #TODO valiate the presence in the Naviterier DB of Addresses
+    pass
 
 
 def _getFirstItinerary(response):
