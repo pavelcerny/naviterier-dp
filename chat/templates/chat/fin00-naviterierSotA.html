@@ -44,7 +44,7 @@
         function redirectToNavigation(sourceAddress,targetAddress) {
             var sourceEncoded = encodeURIComponent(sourceAddress).replace(/%20/g, '+');
             var targetEncoded = encodeURIComponent(targetAddress).replace(/%20/g, '+');
-            window.location.replace("{% url 'chat:navigateExample'%}?SourceAddress=" + sourceEncoded + "&TargetAddress=" + targetEncoded);
+            window.location.replace("{% url 'chat:navigate'%}?SourceAddress=" + sourceEncoded + "&TargetAddress=" + targetEncoded);
         }
     </script>
 {% endblock %}

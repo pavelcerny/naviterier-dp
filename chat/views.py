@@ -55,7 +55,7 @@ def reverseGeocoding(request):
     return render(request, 'chat/dev01-reverse-geocoding.html')
 
 
-def navigateExample(request):
+def navigate(request):
     if "TargetAddress" in request.GET:
         targetAddress = request.GET["TargetAddress"]
         sourceAddress = request.GET["SourceAddress"]

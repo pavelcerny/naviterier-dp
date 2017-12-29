@@ -425,7 +425,7 @@
             var sourceEncoded = encodeURIComponent(sourceAddress).replace(/%20/g, '+');
             var targetEncoded = encodeURIComponent(targetAddress).replace(/%20/g, '+');
 
-            var url = "{% url 'chat:navigateExample'%}?SourceAddress=" + sourceEncoded + "&TargetAddress=" + targetEncoded
+            var url = "{% url 'chat:navigate'%}?SourceAddress=" + sourceEncoded + "&TargetAddress=" + targetEncoded
             //window.location.replace(url);
             openInNewTab(url);
         }
