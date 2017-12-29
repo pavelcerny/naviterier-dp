@@ -236,11 +236,11 @@ def _getFirstItinerary(response):
 
     if "TargetAddress" not in response:
         if "SourceAddress" not in response:
-            return generateErrorItinerary("Target address and Source address are wrongly written. Double check they are correct")
+            return generateErrorItinerary("Target address and Source address are wrongly written or not in the database. Double check they are correct")
         else:
-            return generateErrorItinerary("Target address is wrongly written. Double check it's correct")
+            return generateErrorItinerary("Target address is wrongly written or not in the database. Double check it's correct")
     if "SourceAddress" not in response:
-        return generateErrorItinerary("Source address is wrongly written. Double check it's correct")
+        return generateErrorItinerary("Source address is wrongly written or not in the database. Double check it's correct")
 
     # return the first variant(response can contain more variants)
     itinerary = response["Routes"][0]["Itinerary"]
