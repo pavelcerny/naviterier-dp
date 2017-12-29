@@ -90,7 +90,7 @@ def getGpsFromAddressAPI(request):
 
 def getItineraryFromAddressToAddressAPI(request):
     '''
-
+    Return the first itineary between two addresses
     :param request:
     :return:
     '''
@@ -107,6 +107,11 @@ def getItineraryFromAddressToAddressAPI(request):
 
 
 def getItineraryFromSegmentIdToAddressAPI(request):
+    '''
+    Return the first itineary between a segment and an address
+    :param request:
+    :return:
+    '''
     # unpack
     sourceAddress = request.GET['SourceSegmentId']
     tartgetAddress = request.GET['TargetAddress']
