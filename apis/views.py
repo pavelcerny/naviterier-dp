@@ -13,7 +13,7 @@ def getAddressesInNaviterierAPI(request):
     """
     Returns JSON with all addresses stored at the Naviterier server
 
-    :returns
+    :returns dictionary full of addresses
     {"Addresses": [ {"Id": "40825124",
                     "Shape": {"Latitude": 50.0887841946588, "Longitude": 14.4442259626852},
                     "Street": "Pernerova",
@@ -34,7 +34,13 @@ def getAddressesInNaviterierAPI(request):
 
 @csrf_exempt
 def findRoutesAPI(request):
-    # unpack
+    '''
+    Returns a route's itinerary between SourceAddress and TargetAddress. The route is prepared by Naviterier server.
+
+    :param request: must contain post["SourceAddress"] and post["TargetAddress"]
+    :return: JSON with a route dictionary
+    '''
+    # unpack parameters
     sourceAddress = request.post["SourceAddress"]
     targetAddress = request.post["TargetAddress"]
 
@@ -51,7 +57,11 @@ def findRoutesAPI(request):
 
 @csrf_exempt
 def getAddressFromGpsAPI(request):
-    """ return address from lat lon """
+    '''
+    return String with address from lat lon
+    :param request:
+    :return: Street and house number i.e. 'Technická 6'
+    '''
     lat = request.GET['lat']
     lon = request.GET['lon']
 
@@ -64,7 +74,11 @@ def getAddressFromGpsAPI(request):
 
 @csrf_exempt
 def getGpsFromAddressAPI(request):
-    """ get GPS coords from Address """
+    '''
+    get GPS coords from Address
+    :param request:
+    :return: json {"lat", "lon"}
+    '''
     # extract
     address = request.GET['address']
 
@@ -77,6 +91,11 @@ def getGpsFromAddressAPI(request):
 
 
 def getNavigationItineraryFromAddressToAddress(request):
+    '''
+
+    :param request:
+    :return:
+    '''
     # unpack
     sourceAddress = request.GET['SourceAddress']
     tartgetAddress = request.GET['TargetAddress']
