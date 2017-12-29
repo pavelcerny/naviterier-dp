@@ -198,7 +198,7 @@ def _getFirstItinerary(response):
                [...]
     }
 
-    :returns the first itinerary Descriptions + stages
+    :returns the first itinerary GeneralDescriptions & Stages
     i.e.
     {'GeneralDescription': 'Trasa z adresy Lazarská 1718/3 na adresu Myslíkova 187/13. Trasa je asi 380 metrů dlouhá a vede přes 4 přechody. Postav se tak, abys měl budovy za zády.',
      'Stages': ['1. úsek z 12. \r\nNacházíš se na adrese Lazarská 1718/3. \r\nOtoč se vpravo a jdi asi 10 metrů mírně z kopce na roh s ulicí Magdalény Rettigové. Po pravé ruce měj budovy.',
