@@ -159,7 +159,7 @@
             }
 
             this.textWatson = function (callback) {
-                var url = "{% url 'chat:watson_response' %}";
+                var url = "{% url 'apis:watsonResponse' %}";
                 var post_data = {
                     csrfmiddlewaretoken: "{{ csrf_token }}",
                     context: self.context,
