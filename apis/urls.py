@@ -16,7 +16,7 @@ urlpatterns = [
     url(r'^gpsFromAddress$', views.getGpsFromAddressAPI, name='gpsFromAddress'),
     url(r'^addressFromGps$', views.getAddressFromGpsAPI, name='addressFromGps'),
     # watson
-    url(r'^watson$', views.watsonResponse, name='watsonResopnse'),
+    url(r'^watsonResponse$', views.watsonResponse, name='watsonResponse'),
 
 
 ]
