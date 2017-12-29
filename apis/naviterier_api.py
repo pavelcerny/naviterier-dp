@@ -162,11 +162,11 @@ def _filterByFormOfWay(segments, formOfWay):
     return sidewalks
 
 
-def getItinerary(sourceAddress, TargetAddress):
+def getItinerary(sourceAddress, targetAddress):
     '''
     Get route's itinerary between sourceAddress and TargetAddress
     :param sourceAddress: String in format 'FromStreet houseNumber'
-    :param TargetAddress: String in format 'ToStreet houseNumber'
+    :param targetAddress: String in format 'ToStreet houseNumber'
     :returns: description and stages of the path
     i.e.
     {dict}{'GeneralDescription': 'Trasa z adresy Lazarská 1718/3 na adresu Myslíkova 187/13. Trasa je asi 380 metrů dlouhá a vede přes 4 přechody. Postav se tak, abys měl budovy za zády.',
@@ -177,7 +177,7 @@ def getItinerary(sourceAddress, TargetAddress):
                       ]}
     '''
 
-    response = findRoutes(sourceAddress, TargetAddress)
+    response = findRoutes(sourceAddress, targetAddress)
     # take the first result (there can be more results)
     response = _getFirstItinerary(response)
 
