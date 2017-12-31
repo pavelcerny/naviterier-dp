@@ -438,7 +438,7 @@
                 }
 
                 //update when compas changes more than 15 degrees since the last displayed value
-                if ((self.lastLeftPercents - leftPercents + 100) % 100 > 15) {
+                if (Math.abs(self.lastLeftPercents - leftPercents) > 15) {
                     if (leftPercents > 50) {
                         direction = "doleva";
                     } else {
