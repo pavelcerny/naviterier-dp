@@ -131,7 +131,7 @@
             this.userGpsReady = false;
             this.userCompassReady = false;
             this.lastLeftPercentage = 0;
-            this.firstRunPercentage = true;
+            this.initializeSecondScreen = true;
 
             this.nBeforeCornerColected = 0;
             this.nAfterCornerColected = 0;
@@ -178,7 +178,7 @@
             this.goFirst = function () {
                 self.currentui = 1;
                 self.drawGui();
-                self.firstRunPercentage = true;
+                self.initializeSecondScreen = true;
             }
 
             this.goSecond = function () {
@@ -427,14 +427,15 @@
                 var basetext = "Stoupni si zády k budově a vydej se ";
                 var text = basetext + direction;
 
-                if (self.firstRunPercentage) {
+                //initialize texts and buttons to default
+                if (self.initializeSecondScreen) {
                     self.$ui2_command.html('');
                     self.$ui2_command.hide();
 
                     self.$ui2_routeStarts.html(text);
                     self.$ui2_buttonIGo.html('jdu ' + direction);
                     //self.$ui2_routeStartsPercentage.html('doleva');
-                    self.firstRunPercentage = false;
+                    self.initializeSecondScreen = false;
                 }
 
 
