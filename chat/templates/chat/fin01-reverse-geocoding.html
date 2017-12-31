@@ -232,6 +232,7 @@
             }
 
             this.showGpsStatus = function (newValue) {
+                // redraw the accuracy, only when |displayed - actual|>= 5m
                 self.prevAccuracy = self.shownAccuracy;
                 self.shownAccuracy = Math.round(newValue);
                 // when accuracy changes for at least 10m
