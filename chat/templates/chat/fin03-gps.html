@@ -385,7 +385,7 @@
 
                 function getAngleTarget() {
                     var targetVector = [targetCoords.lon_x - userCoords.lon_x, targetCoords.lat_y - userCoords.lat_y];
-                    var northVector = [1, 1];
+                    var northVector = [0, 1];
 
                     var cosAlpha = math.dot(targetVector, northVector) / ( math.norm(targetVector) * math.norm(northVector) );
                     var atan2value = Math.atan2(targetVector[0], targetVector[1]);
