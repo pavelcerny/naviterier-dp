@@ -243,8 +243,7 @@
             type: "GET",
             url: url,
             data: get_data,
-            success: function (json) {
-                object = JSON.parse(json);
+            success: function (object) {
                 targetGpsHandler(object.lat,object.lon)
             },
         });
