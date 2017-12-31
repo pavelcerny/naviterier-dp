@@ -120,6 +120,7 @@
             }
 
             this.setNavigationDetails = function () {
+                // make variable navigationDetails ready for launching the navigation
                 var navigationDetails = {
                     "TargetLandregistryNumber": self.context.TargetLandregistryNumber,
                     "TargetStreet": self.context.TargetStreet,
@@ -169,8 +170,11 @@
             }
 
             this.drawGui = function () {
+                // process the dialogue response or launch the navigation
                 self.displayMessage(self.question);
                 self.$answer.val('');
+
+                // end dialog and launch navigation
                 if (self.done) {
                     self.setNavigationDetails();
                     self.startNavigation();
