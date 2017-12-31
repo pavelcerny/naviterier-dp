@@ -61,18 +61,7 @@
 
 
 
-    <script>
-        function redirectToNavigation(sourceAddress, targetAddress, currentUrl) {
-            var sourceEncoded = encodeURIComponent(sourceAddress).replace(/%20/g, '+');
-            var targetEncoded = encodeURIComponent(targetAddress).replace(/%20/g, '+');
-            var finalUrl = "{% url 'chat:navigate'%}?SourceAddress=" + sourceEncoded + "&TargetAddress=" + targetEncoded;
-            if (currentUrl !== undefined) {
-                var currentUrl = "{{ request.path }}"
-                finalUrl += "&PreviousUrl=" + currentUrl
-            }
-            window.location.replace(finalUrl);
-        }
-    </script>
+
 
     <script>
         function Search(text_id, alert1_id, alert2_id, alert2_2_id, goSecond_id, goFirst_id, goStart_id, gpsStatus_id, firstPart_id,

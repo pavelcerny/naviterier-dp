@@ -90,18 +90,7 @@
     </script>
 
 
-    <script>
-        function redirectToNavigation(sourceAddress, targetAddress, currentUrl) {
-            var sourceEncoded = encodeURIComponent(sourceAddress).replace(/%20/g, '+');
-            var targetEncoded = encodeURIComponent(targetAddress).replace(/%20/g, '+');
-            var finalUrl = "{% url 'chat:navigate'%}?SourceAddress=" + sourceEncoded + "&TargetAddress=" + targetEncoded;
-            if (currentUrl !== undefined) {
-                var currentUrl = "{{ request.path }}"
-                finalUrl += "&PreviousUrl=" + currentUrl
-            }
-            window.location.replace(finalUrl);
-        }
-    </script>
+
 
 
     <script>
