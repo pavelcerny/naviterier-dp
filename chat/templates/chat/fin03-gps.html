@@ -130,7 +130,7 @@
             this.userAngle = 0;
             this.userGpsReady = false;
             this.userCompassReady = false;
-            this.lastLeftPercentage = 0;
+            this.lastLeftPercents = 0;
             this.initializeSecondScreen = true;
 
             this.nBeforeCornerColected = 0;
@@ -421,8 +421,7 @@
 
             }
 
-            this.showDirection = function (leftPercentage) {
-                var left = Math.round(leftPercentage / 10) * 10;
+            this.showDirection = function (leftPercents) {
                 var direction = "doleva";
                 var basetext = "Stoupni si zády k budově a vydej se ";
                 var text = basetext + direction;
@@ -438,9 +437,9 @@
                     self.initializeSecondScreen = false;
                 }
 
-
-                if ((self.lastLeftPercentage - left + 100) % 100 > 15) {
-                    if (left > 50) {
+                //update when compas changes more than 15 degrees since the last displayed value
+                if ((self.lastLeftPercents - leftPercents + 100) % 100 > 15) {
+                    if (leftPercents > 50) {
                         direction = "doleva";
                     } else {
                         direction = "doprava";
@@ -448,7 +447,7 @@
                     //self.$ui2_routeStartsPercentage.html(direction);
                     self.$ui2_routeStarts.html(basetext + direction);
                     self.$ui2_buttonIGo.html('jdu ' + direction);
-                    self.lastLeftPercentage = left;
+                    self.lastLeftPercents = leftPercents;
                 }
 
             }
