@@ -74,10 +74,6 @@
         Math.degrees = function (radians) {
             return radians * 180 / Math.PI;
         };
-
-        function mod(n, m) {
-        return ((n % m) + m) % m;
-}
     </script>
 <!--- Init -->
 <script>
@@ -268,31 +264,46 @@
 
         function getAngleTarget() {
             var targetVector = [targetCoords.lon_x - userCoords.lon_x, targetCoords.lat_y - userCoords.lat_y];
-            var atan2value = Math.atan2(targetVector[0], targetVector[1]);
-            var alpha = ( 360 + (atan2value * 180 / Math.PI) ) % 360;
-            return alpha;
+            // compute the angle from X axis
+            // atan2 needs the y as first parameter
+            var atan2value = Math.atan2(targetVector[1], targetVector[0]);
+            // transform to angle from y axis (north)
+            var angleFromNorth = atan2value-Math.PI/2;
+            // transform to degrees <0, 360)
+            var fromNorthInDeg = ( 720 + Math.degrees(angleFromNorth) ) % 360;
+            // convert to clockwise and angle 360° map to 0°
+            return (360 - fromNorthInDeg)%360;
+
+            //todo HAPPY NEW YEAR!
         }
 
-        var alpha = getAngleTarget();
+        var angleTarget = getAngleTarget();
 
         function getAngleUser() {
-            var beta = document.getElementById("direction").innerHTML;
-            return beta;
+            //compass angle, from north, clockwise
+            var angle = document.getElementById("direction").innerHTML;
+            return angle;
         }
 
-        var beta = getAngleUser();
+        var angleUser = getAngleUser();
 
-        function goLeftProbability(target, user) {
+        function getGoLeftRatio(target, user) {
+            // compute a ratio -- on a scale <0,1> say how much is going to left the correct direction.
+
+            //angle between two directions
             var diff = user-target;
 
-            probability = ( Math.sin(Math.radians(diff)) + 1 ) /2;
+            // convert the angle to the ratio
+            //
+            // transform sin(diff) to return outputs in range <0,1>
+            ratio = ( Math.sin(Math.radians(diff)) + 1 ) /2;
 
-            return probability
+            return ratio
 
         }
 
-        var goLeftProbability = goLeftProbability(alpha, beta)
-        var leftPercentage = Math.round(goLeftProbability*100);
+        var goLeftRatio = getGoLeftRatio(angleTarget, angleUser);
+        var leftPercentage = Math.round(goLeftRatio*100);
         var rightPercentage = Math.round(100-leftPercentage);
         showMessageProgress( "go to Left "+ leftPercentage + "% or go right " + rightPercentage + "%" );
 
