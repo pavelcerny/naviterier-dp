@@ -40,34 +40,45 @@ def gpsFromTripleAPI(request):
 
 
 
-def gpsFromTriple(startStopName, startStopDirection, startLineNumber):
-    # find tram line details
-    route = Route.objects.get(route_short_name=startLineNumber)
-    # find all trips with given line, get all their head signs
+def gpsFromTriple(stopName, directionName, lineNumber):
+    # find the routes of given tram line
+    route = Route.objects.get(route_short_name=lineNumber)
+    # find possible headsigns of given tramline
     headsigns = Trip.objects.filter(route=route).order_by('trip_headsign').values('trip_headsign').distinct()
+
 
     for hs in headsigns:
         hs_val = hs['trip_headsign']
 
+        # find all rides with given headsign
         query_headsigns = Trip.objects.filter(route=route, trip_headsign=hs_val)
 
         n_trips = query_headsigns.count()
+
+        # find a ride somewhere in the middle of the day (probably will have less exceptions then the last or first ride)
         tripInHsDirection = query_headsigns[int(n_trips/2)]
+        # find all stops on this ride
         query = Stop_time.objects.filter(trip=tripInHsDirection)
 
-        query_stop = query.filter(stop__stop_name__contains=startStopName)
-        query_direction = query.filter(stop__stop_name__contains=startStopDirection)
+        # find a stop with stopName
+        query_stop = query.filter(stop__stop_name__contains=stopName)
+        # find a stop with directionName
+        query_direction = query.filter(stop__stop_name__contains=directionName)
 
         stop = None
         direction = None
+
+        # trip goes through startStopName
         if query_stop.count()>0:
             stop = query_stop.first()
 
+        # trip goes to startStopDirection
         if query_direction.count()>0:
             direction = query_direction.first()
 
+
         if stop != None and direction != None:
-            # stop and direction is present in this trip
+            # startStopName and direction is present in this trip
             if stop.stop_sequence < direction.stop_sequence:
                 # correct direction
                 response = {
